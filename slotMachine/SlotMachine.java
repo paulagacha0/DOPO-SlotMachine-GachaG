@@ -1,619 +1,572 @@
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Random;
 import javax.swing.JOptionPane;
 
 /**
- * Models a slot machine whose wheels share the same ordered symbol catalog.
- * Public wheel positions are one-based, while internal list indexes are
- * zero-based.
- *
- * @author Paula Gacha and Diego Mojica
- * @version Cycle 2 complete implementation
+ * [SM] Coordina ruedas, catálogo, validaciones y visibilidad.
+ * @author Paula Gacha (extensión del ciclo 4)
  */
 public class SlotMachine
 {
     private static final int FIRST_WHEEL_X = 30;
-    private static final int WHEEL_Y = 70;
-    private static final int WHEEL_SPACING = 65;
-    private static final int STEP_ANIMATION_DELAY_MS = 200;
-
+    private static final int WHEEL_Y = 40;
+    private static final int WHEEL_SPACING = 90;
+    private static final int WHEELS_PER_ROW = 10;
+    private static final int ROW_SPACING = 110;
+    private static final int STEP_DELAY = 200;
     private final ArrayList<Wheel> wheels;
-    private final ArrayList<String> symbols;
-    private boolean isVisible;
-    private boolean lastOperationSuccessful;
-    private boolean isRunning;
+    private final ArrayList<Symbol> symbols;
+    private boolean visible;
+    private boolean successful;
+    private boolean running;
 
-    /**
-     * Creates an empty, visible slot machine.
-     */
+    /** [SM] Crea una máquina vacía, lista para agregar elementos. */
     public SlotMachine()
     {
         wheels = new ArrayList<>();
         symbols = new ArrayList<>();
-        isVisible = true;
-        lastOperationSuccessful = true;
-        isRunning = true;
+        visible = true;
+        successful = true;
+        running = true;
     }
 
     /**
-     * Inserts an empty wheel at the requested one-based position.
-     *
-     * @param pos position from 1 to the current number of wheels plus one
+     * [SM -> COL, W] Crea n ruedas normales con símbolos normales al azar.
+     * @param n cantidad de ruedas y símbolos, entre 3 y 50
+     * @throws IllegalArgumentException si el tamaño no está permitido
      */
+    public SlotMachine(int n)
+    {
+        this();
+        if (n < 3 || n > 50) {
+            throw new IllegalArgumentException("The size must be between 3 and 50.");
+        }
+        visible = false;
+        for (String color : SymbolColors.createPalette(n)) {
+            addSymbol(symbols.size() + 1, color);
+        }
+        Random random = new Random();
+        for (int i = 0; i < n; i++) {
+            addWheel(i + 1);
+            wheels.get(i).setSymbol(random.nextInt(n));
+        }
+        if (hasJackpot()) {
+            int next = (wheels.get(0).getCurrentSymbolIndex() + 1) % n;
+            wheels.get(n - 1).setSymbol(next);
+        }
+        updateJackpotAppearance();
+    }
+
+    /** [SM] Conserva la operación anterior: agrega una rueda normal. */
     public void addWheel(int pos)
     {
-        if (!ensureRunning()) {
-            return;
-        }
-        if (!isInsertionPosition(pos, wheels.size())) {
-            reportInvalidOperation("The wheel position is invalid.");
-            return;
-        }
-
-        Wheel newWheel = new Wheel(FIRST_WHEEL_X, WHEEL_Y);
-        wheels.add(pos - 1, newWheel);
-        arrangeWheels();
-        if (isVisible) {
-            newWheel.makeVisible();
-        }
-        updateJackpotAppearance();
-        reportSuccessfulOperation();
+        addWheel("normal", pos);
     }
 
     /**
-     * Removes the wheel at the requested one-based position.
-     *
-     * @param pos position of the wheel to remove
+     * [SM -> W] Agrega una rueda del tipo indicado, inicialmente vacía.
+     * @param type normal, lefty, rebel o reverse
+     * @param pos posición desde 1 hasta la cantidad de ruedas más 1
      */
+    public void addWheel(String type, int pos)
+    {
+        if (!ensureRunning()) {
+            return;
+        }
+        if (pos < 1 || pos > wheels.size() + 1) {
+            fail("La posición de la rueda no es válida.");
+            return;
+        }
+        Wheel wheel = createWheel(type);
+        if (wheel == null) {
+            fail("El tipo de rueda no existe.");
+            return;
+        }
+        for (int i = 0; i < symbols.size(); i++) {
+            wheel.addSymbol(i, symbols.get(i));
+        }
+        wheels.add(pos - 1, wheel);
+        arrangeWheels();
+        updateJackpotAppearance();
+        if (visible) {
+            wheel.makeVisible();
+        }
+        successful = true;
+    }
+
+    /** [SM -> W] Elimina la rueda si su tipo lo permite. */
     public void delWheel(int pos)
     {
-        if (!ensureRunning()) {
+        if (!ensureRunning() || !checkWheel(pos)) {
             return;
         }
-        if (!isWheelPosition(pos)) {
-            reportInvalidOperation("The wheel position is invalid.");
+        Wheel wheel = wheels.get(pos - 1);
+        if (!wheel.canBeRemoved()) {
+            fail("Una rueda rebel no se puede eliminar.");
             return;
         }
-
-        Wheel removedWheel = wheels.remove(pos - 1);
-        removedWheel.makeInvisible();
+        wheel.makeInvisible();
+        wheels.remove(pos - 1);
         arrangeWheels();
         updateJackpotAppearance();
-        reportSuccessfulOperation();
+        successful = true;
     }
 
-    /**
-     * Swaps two wheels, including their current symbols and lock states.
-     * Public wheel positions are one-based.
-     *
-     * @param wheel1 position of the first wheel
-     * @param wheel2 position of the second wheel
-     */
+    /** [SM -> W] Intercambia los objetos completos, si ambos tipos lo permiten. */
     public void swap(int wheel1, int wheel2)
     {
-        if (!ensureRunning()) {
+        if (!ensureRunning() || !checkWheel(wheel1) || !checkWheel(wheel2)) {
             return;
         }
-        if (!isWheelPosition(wheel1) || !isWheelPosition(wheel2)) {
-            reportInvalidOperation("A wheel position is invalid.");
+        Wheel first = wheels.get(wheel1 - 1);
+        Wheel second = wheels.get(wheel2 - 1);
+        if (!first.canBeSwapped() || !second.canBeSwapped()) {
+            fail("Una rueda rebel no se puede intercambiar.");
             return;
         }
-
-        Wheel firstWheel = wheels.get(wheel1 - 1);
-        wheels.set(wheel1 - 1, wheels.get(wheel2 - 1));
-        wheels.set(wheel2 - 1, firstWheel);
+        wheels.set(wheel1 - 1, second);
+        wheels.set(wheel2 - 1, first);
         arrangeWheels();
         updateJackpotAppearance();
-        reportSuccessfulOperation();
+        successful = true;
     }
 
-    /**
-     * Locks a wheel so spin operations cannot rotate it.
-     *
-     * @param wheel one-based wheel position
-     */
+    /** [SM -> W] Bloquea una rueda que acepte bloqueo. */
     public void lock(int wheel)
     {
-        if (!ensureRunning()) {
+        if (!ensureRunning() || !checkWheel(wheel)) {
             return;
         }
-        if (!isWheelPosition(wheel)) {
-            reportInvalidOperation("The wheel position is invalid.");
+        Wheel selected = wheels.get(wheel - 1);
+        if (!selected.canBeLocked() || selected.isLocked()) {
+            fail("La rueda no admite bloqueo o ya está bloqueada.");
             return;
         }
-
-        Wheel selectedWheel = wheels.get(wheel - 1);
-        if (selectedWheel.isLocked()) {
-            reportInvalidOperation("The wheel is already locked.");
-            return;
-        }
-
-        selectedWheel.lock();
-        reportSuccessfulOperation();
+        selected.lock();
+        successful = true;
     }
 
-    /**
-     * Unlocks a wheel so spin operations can rotate it again.
-     *
-     * @param wheel one-based wheel position
-     */
+    /** [SM -> W] Desbloquea una rueda previamente bloqueada. */
     public void unlock(int wheel)
     {
-        if (!ensureRunning()) {
+        if (!ensureRunning() || !checkWheel(wheel)) {
             return;
         }
-        if (!isWheelPosition(wheel)) {
-            reportInvalidOperation("The wheel position is invalid.");
+        Wheel selected = wheels.get(wheel - 1);
+        if (!selected.isLocked()) {
+            fail("La rueda no está bloqueada.");
             return;
         }
-
-        Wheel selectedWheel = wheels.get(wheel - 1);
-        if (!selectedWheel.isLocked()) {
-            reportInvalidOperation("The wheel is already unlocked.");
-            return;
-        }
-
-        selectedWheel.unlock();
-        reportSuccessfulOperation();
+        selected.unlock();
+        successful = true;
     }
 
-    /**
-     * Inserts a new color symbol at the requested one-based position.
-     * Existing wheels keep showing the same colors after the insertion.
-     *
-     * @param pos position from 1 to the current number of symbols plus one
-     * @param color supported color name
-     */
+    /** [SM] Conserva la operación anterior: agrega un símbolo normal. */
     public void addSymbol(int pos, String color)
     {
-        String normalizedColor = normalizeColor(color);
-        if (!ensureRunning()) {
-            return;
-        }
-        if (!isInsertionPosition(pos, symbols.size())) {
-            reportInvalidOperation("The symbol position is invalid.");
-            return;
-        }
-        if (!isSupportedSymbolColor(normalizedColor)) {
-            reportInvalidOperation("The symbol color is invalid.");
-            return;
-        }
-        if (symbols.contains(normalizedColor)) {
-            reportInvalidOperation("The symbol color already exists.");
-            return;
-        }
-
-        int symbolIndex = pos - 1;
-        symbols.add(symbolIndex, normalizedColor);
-        for (Wheel wheel : wheels) {
-            wheel.adjustAfterSymbolInsertion(symbolIndex);
-        }
-        reportSuccessfulOperation();
+        addSymbol("normal", pos, color);
     }
 
     /**
-     * Deletes a symbol. A wheel showing that symbol becomes empty.
-     *
-     * @param symbol color symbol to remove
+     * [SM -> S, W] Agrega el símbolo al catálogo y una copia a cada rueda.
+     * @param type normal, ephemeral o shy
+     * @param pos posición desde 1 hasta la cantidad de símbolos más 1
+     * @param color color único del símbolo; el blanco se reserva para el vacío
      */
+    public void addSymbol(String type, int pos, String color)
+    {
+        if (!ensureRunning()) {
+            return;
+        }
+        String normalized = SymbolColors.normalize(color);
+        if (pos < 1 || pos > symbols.size() + 1) {
+            fail("La posición del símbolo no es válida.");
+            return;
+        }
+        if (!SymbolColors.isSymbol(normalized) || findSymbol(normalized) >= 0) {
+            fail("El color no es válido o ya existe.");
+            return;
+        }
+        Symbol symbol = createSymbol(type, normalized);
+        if (symbol == null) {
+            fail("El tipo de símbolo no existe.");
+            return;
+        }
+        symbols.add(pos - 1, symbol);
+        for (Wheel wheel : wheels) {
+            wheel.addSymbol(pos - 1, symbol);
+        }
+        successful = true;
+    }
+
+    /** [SM -> W] Elimina el símbolo y vacía las ruedas que lo tenían seleccionado. */
     public void delSymbol(String symbol)
     {
-        String normalizedSymbol = normalizeColor(symbol);
-        int symbolIndex = symbols.indexOf(normalizedSymbol);
         if (!ensureRunning()) {
             return;
         }
-        if (symbolIndex < 0) {
-            reportInvalidOperation("The symbol does not exist.");
+        int index = findSymbol(symbol);
+        if (index < 0) {
+            fail("El símbolo no existe.");
             return;
         }
-
-        symbols.remove(symbolIndex);
+        symbols.remove(index);
         for (Wheel wheel : wheels) {
-            wheel.adjustAfterSymbolRemoval(symbolIndex);
+            wheel.removeSymbol(index);
         }
         updateJackpotAppearance();
-        reportSuccessfulOperation();
+        successful = true;
     }
 
-    /**
-     * Places an existing symbol on a wheel.
-     *
-     * @param wheel one-based wheel position
-     * @param symbol existing color symbol
-     */
+    /** [SM -> W] Selecciona directamente un símbolo; shy alterna su visibilidad. */
     public void placeSymbol(int wheel, String symbol)
     {
-        String normalizedSymbol = normalizeColor(symbol);
-        int symbolIndex = symbols.indexOf(normalizedSymbol);
-        if (!ensureRunning()) {
+        if (!ensureRunning() || !checkWheel(wheel)) {
             return;
         }
-        if (!isWheelPosition(wheel)) {
-            reportInvalidOperation("The wheel position is invalid.");
+        int index = findSymbol(symbol);
+        if (index < 0) {
+            fail("El símbolo no existe.");
             return;
         }
-        if (symbolIndex < 0) {
-            reportInvalidOperation("The symbol does not exist.");
-            return;
-        }
-
-        wheels.get(wheel - 1).setSymbol(symbolIndex, normalizedSymbol);
+        wheels.get(wheel - 1).setSymbol(index);
         updateJackpotAppearance();
-        reportSuccessfulOperation();
+        successful = true;
     }
 
-    /**
-     * Rotates one wheel one step.
-     *
-     * @param wheel one-based wheel position
-     */
+    /** [SM] Gira una rueda un paso. */
     public void spin(int wheel)
     {
         spin(wheel, 1);
     }
 
-    /**
-     * Rotates one wheel the requested number of steps. Positive values move
-     * forward and negative values move backwards through the shared symbol
-     * catalog. When the machine is visible, every individual step is shown.
-     *
-     * @param wheel one-based wheel position
-     * @param steps signed number of positions to rotate
-     */
+    /** [SM -> W] Valida y solicita un giro; cada tipo decide cómo realizarlo. */
     public void spin(int wheel, int steps)
     {
-        if (!ensureRunning()) {
+        if (!ensureRunning() || !checkWheel(wheel)) {
             return;
         }
-        if (!isWheelPosition(wheel)) {
-            reportInvalidOperation("The wheel position is invalid.");
+        Wheel selected = wheels.get(wheel - 1);
+        if (symbols.isEmpty() || !selected.canRotate()) {
+            fail("La rueda está bloqueada o no tiene un símbolo para girar.");
             return;
         }
-
-        Wheel selectedWheel = wheels.get(wheel - 1);
-        if (selectedWheel.isLocked()) {
-            reportInvalidOperation("The wheel is locked.");
-            return;
-        }
-        if (symbols.isEmpty() || !selectedWheel.hasSymbol()) {
-            reportInvalidOperation("The wheel does not have a symbol to rotate.");
-            return;
-        }
-
-        rotateWheelBySteps(selectedWheel, steps);
+        rotateWheelBySteps(selected, steps);
         updateJackpotAppearance();
-        reportSuccessfulOperation();
+        successful = true;
     }
 
-    /**
-     * Rotates every wheel one step.
-     */
+    /** [SM -> W] Gira de izquierda a derecha; lefty copia la vecina ya actualizada. */
     public void spin()
     {
         if (!ensureRunning()) {
             return;
         }
         if (wheels.isEmpty() || symbols.isEmpty()) {
-            reportInvalidOperation("The machine does not have wheels and symbols to rotate.");
+            fail("Faltan ruedas o símbolos para girar.");
             return;
         }
-        if (!hasUnlockedWheel()) {
-            reportInvalidOperation("The machine does not have an unlocked wheel to rotate.");
-            return;
-        }
-        if (!allUnlockedWheelsHaveSymbols()) {
-            reportInvalidOperation("Every unlocked wheel must have a symbol before rotating the machine.");
-            return;
-        }
-
+        boolean canSpin = false;
         for (Wheel wheel : wheels) {
             if (!wheel.isLocked()) {
-                rotateWheel(wheel, 1);
+                canSpin = true;
+                if (!wheel.canRotate()) {
+                    fail("Hay una rueda vacía que no puede girar.");
+                    return;
+                }
+            }
+        }
+        if (!canSpin) {
+            fail("Todas las ruedas están bloqueadas.");
+            return;
+        }
+        for (Wheel wheel : wheels) {
+            if (!wheel.isLocked()) {
+                rotateWheelBySteps(wheel, 1);
             }
         }
         updateJackpotAppearance();
-        reportSuccessfulOperation();
+        successful = true;
     }
 
-    /**
-     * Rotates the wheels until the requested configuration is reached.
-     * Every target symbol is validated before any wheel is modified. A locked
-     * wheel must already show its requested symbol.
-     *
-     * @param setSymbols requested symbol for every wheel, in wheel order
-     */
+    /** [SM -> W] Primero planea todos los giros; rechaza destinos imposibles sin cambiar nada. */
     public void spin(String[] setSymbols)
     {
         if (!ensureRunning()) {
             return;
         }
-        if (setSymbols == null) {
-            reportInvalidOperation("The requested configuration is null.");
+        if (setSymbols == null || wheels.isEmpty() || setSymbols.length != wheels.size()) {
+            fail("La configuración solicitada no tiene el tamaño correcto.");
             return;
         }
-        if (wheels.isEmpty()) {
-            reportInvalidOperation("The machine does not have wheels.");
-            return;
-        }
-        if (setSymbols.length != wheels.size()) {
-            reportInvalidOperation("The requested configuration has an invalid size.");
-            return;
-        }
-        if (symbols.isEmpty()) {
-            reportInvalidOperation("The machine does not have symbols.");
-            return;
-        }
-
-        int[] targetIndexes = new int[setSymbols.length];
-        for (int i = 0; i < setSymbols.length; i++) {
-            String normalizedSymbol = normalizeColor(setSymbols[i]);
-            int targetIndex = symbols.indexOf(normalizedSymbol);
-            Wheel wheel = wheels.get(i);
-
-            if (targetIndex < 0) {
-                reportInvalidOperation(
-                    "A symbol in the requested configuration does not exist."
-                );
-                return;
-            }
-            if (!wheel.hasSymbol()) {
-                reportInvalidOperation(
-                    "Every wheel must have a symbol before setting a configuration."
-                );
-                return;
-            }
-            if (wheel.isLocked()
-                && wheel.getCurrentSymbolIndex() != targetIndex) {
-                reportInvalidOperation(
-                    "A locked wheel cannot reach the requested configuration."
-                );
-                return;
-            }
-
-            targetIndexes[i] = targetIndex;
-        }
-
+        int[] targets = new int[wheels.size()];
+        int[] steps = new int[wheels.size()];
         for (int i = 0; i < wheels.size(); i++) {
+            targets[i] = findSymbol(setSymbols[i]);
             Wheel wheel = wheels.get(i);
-            if (!wheel.isLocked()) {
-                int steps = Math.floorMod(
-                    targetIndexes[i] - wheel.getCurrentSymbolIndex(),
-                    symbols.size()
-                );
-                rotateWheelBySteps(wheel, steps);
+            if (targets[i] < 0 || !wheel.hasSymbol()) {
+                fail("Hay un símbolo desconocido o una rueda sin configurar.");
+                return;
+            }
+            if (wheel.isLocked()) {
+                if (wheel.getCurrentSymbolIndex() != targets[i]) {
+                    fail("Una rueda bloqueada no puede alcanzar el destino.");
+                    return;
+                }
+            } else {
+                int leftTarget = i == 0 ? -1 : targets[i - 1];
+                steps[i] = wheel.stepsTo(targets[i], symbols.size(), leftTarget);
+                if (steps[i] < 0) {
+                    fail("Una rueda lefty no puede alcanzar ese destino copiando a su vecina.");
+                    return;
+                }
             }
         }
-
+        for (int i = 0; i < wheels.size(); i++) {
+            if (!wheels.get(i).isLocked()) {
+                rotateWheelBySteps(wheels.get(i), steps[i]);
+            }
+        }
         updateJackpotAppearance();
-        reportSuccessfulOperation();
+        successful = true;
     }
 
-    /**
-     * Returns a copy of the ordered symbol catalog.
-     *
-     * @return available color symbols
-     */
+    /** [SM -> S] Devuelve los colores del catálogo en orden. */
     public String[] symbols()
     {
-        return symbols.toArray(new String[0]);
+        String[] result = new String[symbols.size()];
+        for (int i = 0; i < symbols.size(); i++) {
+            result[i] = symbols.get(i).getColor();
+        }
+        return result;
     }
 
-    /**
-     * Returns the visible symbol of each wheel. An empty wheel is represented
-     * by a null value.
-     *
-     * @return current machine configuration
-     */
+    /** [SM -> W] Devuelve los colores asignados, aunque shy esté oculto; null significa vacío. */
     public String[] configuration()
     {
         String[] result = new String[wheels.size()];
         for (int i = 0; i < wheels.size(); i++) {
             Wheel wheel = wheels.get(i);
             if (wheel.hasSymbol()) {
-                result[i] = symbols.get(wheel.getCurrentSymbolIndex());
+                result[i] = symbols.get(wheel.getCurrentSymbolIndex()).getColor();
             }
         }
         return result;
     }
 
-    /**
-     * Counts the different assigned symbols in the current configuration.
-     * Empty wheels are ignored.
-     *
-     * @return number of distinct assigned symbols
-     */
+    /** [SM] Cuenta símbolos asignados diferentes, sin contar las ruedas vacías. */
     public int distinctSymbols()
     {
         ArrayList<String> distinct = new ArrayList<>();
-        for (String symbol : configuration()) {
-            if (symbol != null && !distinct.contains(symbol)) {
-                distinct.add(symbol);
+        for (String color : configuration()) {
+            if (color != null && !distinct.contains(color)) {
+                distinct.add(color);
             }
         }
         return distinct.size();
     }
 
-    /**
-     * Reports whether every wheel has the same assigned symbol.
-     *
-     * @return true only for a non-empty, fully assigned winning machine
-     */
+    /** [SM] Comprueba que todas las ruedas tengan el mismo símbolo asignado. */
     public boolean isJackpot()
     {
         return hasJackpot();
     }
 
-    /**
-     * Makes every wheel visible.
-     */
+    /** [SM -> W] Consulta el diámetro actual del símbolo; cero si está vacío. */
+    public int symbolSize(int wheel)
+    {
+        return getWheel(wheel).getSymbolSize();
+    }
+
+    /** [SM -> W] Consulta si el símbolo permite dibujarse, independientemente de la ventana. */
+    public boolean isSymbolVisible(int wheel)
+    {
+        return getWheel(wheel).isSymbolVisible();
+    }
+
+    /** [SM -> W] Devuelve el tipo de una rueda. */
+    public String wheelType(int wheel)
+    {
+        return getWheel(wheel).getType();
+    }
+
+    /** [SM -> W] Consulta el bloqueo de una rueda. */
+    public boolean isLocked(int wheel)
+    {
+        return getWheel(wheel).isLocked();
+    }
+
+    /** [SM -> W] Muestra la máquina sin volver a seleccionar sus símbolos. */
     public void makeVisible()
     {
         if (!ensureRunning()) {
             return;
         }
-
-        isVisible = true;
+        visible = true;
         for (Wheel wheel : wheels) {
             wheel.makeVisible();
         }
         updateJackpotAppearance();
-        reportSuccessfulOperation();
+        successful = true;
     }
 
-    /**
-     * Makes every wheel invisible while preserving the machine state.
-     */
+    /** [SM -> W, CV] Oculta la máquina conservando su estado. */
     public void makeInvisible()
     {
         if (!ensureRunning()) {
             return;
         }
-
         for (Wheel wheel : wheels) {
             wheel.makeInvisible();
         }
-        isVisible = false;
+        visible = false;
         Canvas.closeCanvas();
-        reportSuccessfulOperation();
+        successful = true;
     }
 
-    /**
-     * Finishes the simulator and closes its visual canvas.
-     */
+    /** [SM] Oculta la máquina y termina la recepción de órdenes. */
     public void exit()
     {
-        if (!isRunning) {
-            reportInvalidOperation("The simulator has already finished.");
+        if (!ensureRunning()) {
             return;
         }
-
-        for (Wheel wheel : wheels) {
-            wheel.makeInvisible();
-        }
-        isVisible = false;
-        isRunning = false;
-        Canvas.closeCanvas();
-        reportSuccessfulOperation();
+        makeInvisible();
+        running = false;
+        successful = true;
     }
 
-    /**
-     * Reports whether the last command was successful.
-     *
-     * @return true when the last command was valid
-     */
+    /** [SM] Devuelve si el último comando fue válido; las consultas no lo cambian. */
     public boolean ok()
     {
-        return lastOperationSuccessful;
+        return successful;
     }
 
+    /** [SM] Valida que el simulador siga activo. */
     private boolean ensureRunning()
     {
-        if (!isRunning) {
-            reportInvalidOperation("The simulator has already finished.");
+        if (!running) {
+            fail("El simulador ya terminó.");
+        }
+        return running;
+    }
+
+    /** [SM] Valida una posición externa de rueda. */
+    private boolean checkWheel(int wheel)
+    {
+        if (wheel < 1 || wheel > wheels.size()) {
+            fail("La posición de la rueda no es válida.");
             return false;
         }
         return true;
     }
 
-    private boolean isInsertionPosition(int pos, int currentSize)
+    /** [SM] Obtiene una rueda para las consultas, sin modificar ok. */
+    private Wheel getWheel(int wheel)
     {
-        return pos >= 1 && pos <= currentSize + 1;
+        if (wheel < 1 || wheel > wheels.size()) {
+            throw new IllegalArgumentException("The wheel position is invalid.");
+        }
+        return wheels.get(wheel - 1);
     }
 
-    private boolean isWheelPosition(int wheel)
+    /** [SM -> COL, S] Busca por color en el catálogo. */
+    private int findSymbol(String color)
     {
-        return wheel >= 1 && wheel <= wheels.size();
+        String normalized = SymbolColors.normalize(color);
+        for (int i = 0; i < symbols.size(); i++) {
+            if (symbols.get(i).getColor().equals(normalized)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
-    private String normalizeColor(String color)
+    /** [SM] Normaliza el nombre del tipo. */
+    private String normalizeType(String type)
     {
-        return color == null ? null : color.trim().toLowerCase();
+        return type == null ? "" : type.trim().toLowerCase(Locale.ROOT);
     }
 
-    private boolean isSupportedSymbolColor(String color)
+    /** [SM -> W, LW, RW, VW] Elige la clase al crear; los giros usan polimorfismo. */
+    private Wheel createWheel(String type)
     {
-        return "red".equals(color) || "yellow".equals(color)
-            || "blue".equals(color) || "green".equals(color)
-            || "magenta".equals(color) || "black".equals(color);
+        String name = normalizeType(type);
+        if (name.equals("normal")) {
+            return new Wheel(FIRST_WHEEL_X, WHEEL_Y);
+        }
+        if (name.equals("lefty")) {
+            return new LeftyWheel(FIRST_WHEEL_X, WHEEL_Y);
+        }
+        if (name.equals("rebel")) {
+            return new RebelWheel(FIRST_WHEEL_X, WHEEL_Y);
+        }
+        if (name.equals("reverse")) {
+            return new ReverseWheel(FIRST_WHEEL_X, WHEEL_Y);
+        }
+        return null;
     }
 
+    /** [SM -> S, ES, SS] Elige el tipo de símbolo al crearlo. */
+    private Symbol createSymbol(String type, String color)
+    {
+        String name = normalizeType(type);
+        if (name.equals("normal")) {
+            return new Symbol(color);
+        }
+        if (name.equals("ephemeral")) {
+            return new EphemeralSymbol(color);
+        }
+        if (name.equals("shy")) {
+            return new ShySymbol(color);
+        }
+        return null;
+    }
+
+    /** [SM -> W] Actualiza posición y vecina; izquierda significa anterior en la lista. */
     private void arrangeWheels()
     {
         for (int i = 0; i < wheels.size(); i++) {
-            int xPosition = FIRST_WHEEL_X + i * WHEEL_SPACING;
-            wheels.get(i).moveTo(xPosition, WHEEL_Y);
+            Wheel left = i == 0 ? null : wheels.get(i - 1);
+            wheels.get(i).setPosition(i + 1, left);
+            int x = FIRST_WHEEL_X + (i % WHEELS_PER_ROW) * WHEEL_SPACING;
+            int y = WHEEL_Y + (i / WHEELS_PER_ROW) * ROW_SPACING;
+            wheels.get(i).moveTo(x, y);
         }
     }
 
-    private void rotateWheel(Wheel wheel, int steps)
-    {
-        wheel.rotate(steps, symbols.size());
-        String color = symbols.get(wheel.getCurrentSymbolIndex());
-        wheel.showSymbol(color);
-    }
-
+    /** [SM -> W, CV] Anima giros pequeños; los grandes se calculan directamente. */
     private void rotateWheelBySteps(Wheel wheel, int steps)
     {
-        if (!isVisible || steps == 0) {
-            rotateWheel(wheel, steps);
+        long count = Math.abs((long) steps);
+        if (!visible || count > 100 || steps == 0) {
+            wheel.rotate(steps, symbols.size());
             return;
         }
-
         int direction = steps > 0 ? 1 : -1;
-        long remainingSteps = Math.abs((long) steps);
-        while (remainingSteps > 0) {
-            rotateWheel(wheel, direction);
+        for (long i = 0; i < count; i++) {
+            wheel.rotate(direction, symbols.size());
             updateJackpotAppearance();
-            Canvas.getCanvas().wait(STEP_ANIMATION_DELAY_MS);
-            remainingSteps--;
+            Canvas.getCanvas().wait(STEP_DELAY);
         }
     }
 
-    private boolean allWheelsHaveSymbols()
-    {
-        for (Wheel wheel : wheels) {
-            if (!wheel.hasSymbol()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean hasUnlockedWheel()
-    {
-        for (Wheel wheel : wheels) {
-            if (!wheel.isLocked()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean allUnlockedWheelsHaveSymbols()
-    {
-        for (Wheel wheel : wheels) {
-            if (!wheel.isLocked() && !wheel.hasSymbol()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    /** [SM -> W] Ganar exige al menos una rueda y ninguna vacía. */
     private boolean hasJackpot()
     {
-        if (wheels.isEmpty() || !allWheelsHaveSymbols()) {
+        if (wheels.isEmpty() || !wheels.get(0).hasSymbol()) {
             return false;
         }
-
-        int firstIndex = wheels.get(0).getCurrentSymbolIndex();
+        int first = wheels.get(0).getCurrentSymbolIndex();
         for (Wheel wheel : wheels) {
-            if (wheel.getCurrentSymbolIndex() != firstIndex) {
+            if (!wheel.hasSymbol() || wheel.getCurrentSymbolIndex() != first) {
                 return false;
             }
         }
         return true;
     }
 
+    /** [SM -> W] Aplica el marco amarillo si hay jackpot. */
     private void updateJackpotAppearance()
     {
         boolean jackpot = hasJackpot();
@@ -622,21 +575,12 @@ public class SlotMachine
         }
     }
 
-    private void reportSuccessfulOperation()
+    /** [SM] Registra el fallo; solo muestra mensajes si la máquina está visible. */
+    private void fail(String message)
     {
-        lastOperationSuccessful = true;
-    }
-
-    private void reportInvalidOperation(String message)
-    {
-        lastOperationSuccessful = false;
-        if (isVisible) {
-            JOptionPane.showMessageDialog(
-                null,
-                message,
-                "Slot Machine",
-                JOptionPane.WARNING_MESSAGE
-            );
+        successful = false;
+        if (visible) {
+            JOptionPane.showMessageDialog(null, message, "Slot Machine", JOptionPane.WARNING_MESSAGE);
         }
     }
 }

@@ -1,27 +1,24 @@
 import java.awt.*;
-
 /**
- * A rectangle that can be manipulated and that draws itself on a canvas.
- * 
- * @author  Michael Kolling and David J. Barnes (Modified)
- * @version 1.0  (15 July 2000)()
+ * [RE] Representa un rectángulo gráfico reutilizado de shapes, no participa enlógica actual
+ * de SlotMachine
  */
-
-
- 
 public class Rectangle{
-
+    /**
+     * [RE] Valor compartido 4
+     */
     public static int EDGES = 4;
-    
+    /**
+     * [RE] Configuraciones iniciales y demas
+     */
     private int height;
     private int width;
     private int xPosition;
     private int yPosition;
     private String color;
     private boolean isVisible;
-
     /**
-     * Create a new rectangle at default position with default color.
+     * [RE] Construye un rectángulo con sus valores iniciales y lo deja invisible
      */
     public Rectangle(){
         height = 30;
@@ -31,79 +28,65 @@ public class Rectangle{
         color = "magenta";
         isVisible = false;
     }
-    
-
     /**
-     * Make this rectangle visible. If it was already visible, do nothing.
+     * [RE] Muestra este rectángulo con el estado que tiene guardado
      */
     public void makeVisible(){
         isVisible = true;
         draw();
     }
-    
     /**
-     * Make this rectangle invisible. If it was already invisible, do nothing.
+     * [RE] Oculta este rectángulo sin borrar sus atributos
      */
     public void makeInvisible(){
         erase();
         isVisible = false;
     }
-    
     /**
-     * Move the rectangle a few pixels to the right.
+     * [RE] Desplaza este rectángulo 20 píxeles hacia derecha
      */
     public void moveRight(){
         moveHorizontal(20);
     }
-
     /**
-     * Move the rectangle a few pixels to the left.
+     * [RE] Desplaza este rectángulo 20 píxeles hacia izquierda
      */
     public void moveLeft(){
         moveHorizontal(-20);
     }
-
     /**
-     * Move the rectangle a few pixels up.
+     * [RE] Desplaza este rectángulo 20 píxeles hacia arriba
      */
     public void moveUp(){
         moveVertical(-20);
     }
-
     /**
-     * Move the rectangle a few pixels down.
+     * [RE] Desplaza este rectángulo 20 píxeles hacia abajo
      */
     public void moveDown(){
         moveVertical(20);
     }
-
     /**
-     * Move the rectangle horizontally.
-     * @param distance the desired distance in pixels
+     * [RE] Cambia xPosition una distancia y actualiza el dibujo
      */
     public void moveHorizontal(int distance){
         erase();
         xPosition += distance;
         draw();
     }
-
     /**
-     * Move the rectangle vertically.
-     * @param distance the desired distance in pixels
+     * [RE] Cambia yPosition una distanci y actualiza el dibujo
      */
     public void moveVertical(int distance){
         erase();
         yPosition += distance;
         draw();
     }
-
     /**
-     * Slowly move the rectangle horizontally.
-     * @param distance the desired distance in pixels
+     * [RE] Desplaza xPosition píxel a píxel en la dirección pedida.
      */
     public void slowMoveHorizontal(int distance){
         int delta;
-
         if(distance < 0) {
             delta = -1;
             distance = -distance;
@@ -116,16 +99,13 @@ public class Rectangle{
             draw();
         }
     }
-
     /**
-     * Slowly move the rectangle vertically.
-     * @param distance the desired distance in pixels
+     * [RE] Desplaza yPosition píxel a píxel en la dirección pedida
      */
     public void slowMoveVertical(int distance){
         int delta;
 
-        if(distance < 0) {
-            delta = -1;
+        if(distance < 0) { delta = -1;
             distance = -distance;
         } else {
             delta = 1;
@@ -136,11 +116,8 @@ public class Rectangle{
             draw();
         }
     }
-
     /**
-     * Change the size to the new size
-     * @param newHeight the new height in pixels. newHeight must be >=0.
-     * @param newWidht the new width in pixels. newWidth must be >=0.
+     * [RE] Cambia height y width y actualiza rectángulo
      */
     public void changeSize(int newHeight, int newWidth) {
         erase();
@@ -148,33 +125,29 @@ public class Rectangle{
         width = newWidth;
         draw();
     }
-    
     /**
-     * Change the color. 
-     * @param color the new color. Valid colors are "red", "yellow", "blue", "green",
-     * "magenta" and "black".
+     * [RE] Guarda el color solicitado y vuelve a dibujar el rectángulo
+     * ->CV
      */
     public void changeColor(String newColor){
         color = newColor;
         draw();
     }
-
-    /*
-     * Draw the rectangle with current specifications on screen.
+    /**
+     * [RE] Entrega a Canvas la geometría y el color de este rectángulo, si está visible
+     * ->CV.
      */
-
     private void draw() {
         if(isVisible) {
             Canvas canvas = Canvas.getCanvas();
             canvas.draw(this, color,
-                new java.awt.Rectangle(xPosition, yPosition, 
-                                       width, height));
+                new java.awt.Rectangle(xPosition, yPosition,width, height));
             canvas.wait(10);
         }
     }
-
-    /*
-     * Erase the rectangle on screen.
+    /**
+     * [RE] Pide retirar de Canvas el dibujo de este rectángulo si estaba visible
+     * ->CV.
      */
     private void erase(){
         if(isVisible) {
@@ -183,4 +156,3 @@ public class Rectangle{
         }
     }
 }
-

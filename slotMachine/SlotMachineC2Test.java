@@ -1,23 +1,14 @@
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Unit tests for all Cycle 2 functional requirements.
- * Every test runs with the simulator in invisible mode.
- *
- * @author Paula Gacha
- * @version Cycle 2 complete tests
- */
+/** [P -> SM] Pruebas sencillas de bloqueo, intercambio y giros. */
 public class SlotMachineC2Test
 {
+    /** [P] Máquina que se prepara antes de cada prueba. */
     private SlotMachine machine;
 
-    /**
-     * Creates an invisible machine before every test.
-     */
+    /** [P] Prepara una máquina nueva e invisible antes de cada caso de prueba. */
     @Before
     public void setUp()
     {
@@ -25,6 +16,7 @@ public class SlotMachineC2Test
         machine.makeInvisible();
     }
 
+    /** [P] Comprueba el intercambio de dos ruedas. */
     @Test
     public void shouldSwapTwoWheels()
     {
@@ -32,13 +24,11 @@ public class SlotMachineC2Test
 
         machine.swap(1, 2);
 
-        assertArrayEquals(
-            new String[] {"blue", "red"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"blue", "red"}, machine.configuration());
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba que no haya intercambio parcial con una posición inválida. */
     @Test
     public void shouldNotSwapWhenAWheelPositionIsInvalid()
     {
@@ -46,13 +36,11 @@ public class SlotMachineC2Test
 
         machine.swap(1, 3);
 
-        assertArrayEquals(
-            new String[] {"red", "blue"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red", "blue"}, machine.configuration());
         assertFalse(machine.ok());
     }
 
+    /** [P] Comprueba que un giro directo respete el bloqueo. */
     @Test
     public void shouldKeepALockedWheelStillDuringDirectSpin()
     {
@@ -61,13 +49,11 @@ public class SlotMachineC2Test
 
         machine.spin(1);
 
-        assertArrayEquals(
-            new String[] {"red"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red"}, machine.configuration());
         assertFalse(machine.ok());
     }
 
+    /** [P] Comprueba que desbloquear permita un giro posterior. */
     @Test
     public void shouldUnlockAWheelAndAllowItToSpinAgain()
     {
@@ -77,13 +63,11 @@ public class SlotMachineC2Test
         machine.unlock(1);
         machine.spin(1);
 
-        assertArrayEquals(
-            new String[] {"blue"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"blue"}, machine.configuration());
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba que el giro general omita las bloqueadas. */
     @Test
     public void shouldSpinOnlyUnlockedWheels()
     {
@@ -97,13 +81,11 @@ public class SlotMachineC2Test
 
         machine.spin();
 
-        assertArrayEquals(
-            new String[] {"red", "blue"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red", "blue"}, machine.configuration());
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba que el bloqueo viaje con el objeto intercambiado. */
     @Test
     public void shouldKeepTheLockStateWithTheSwappedWheel()
     {
@@ -113,13 +95,11 @@ public class SlotMachineC2Test
         machine.swap(1, 2);
         machine.spin(2);
 
-        assertArrayEquals(
-            new String[] {"blue", "red"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"blue", "red"}, machine.configuration());
         assertFalse(machine.ok());
     }
 
+    /** [P] Comprueba el rechazo de bloquear o desbloquear dos veces. */
     @Test
     public void shouldRejectRepeatedLockAndUnlockCommands()
     {
@@ -136,6 +116,7 @@ public class SlotMachineC2Test
         assertFalse(machine.ok());
     }
 
+    /** [P] Comprueba posiciones que no corresponden a ruedas. */
     @Test
     public void shouldRejectInvalidLockAndUnlockPositions()
     {
@@ -148,6 +129,7 @@ public class SlotMachineC2Test
         assertFalse(machine.ok());
     }
 
+    /** [P] Comprueba un giro que da más de una vuelta al catálogo. */
     @Test
     public void shouldRotateAWheelSeveralPositiveSteps()
     {
@@ -155,13 +137,11 @@ public class SlotMachineC2Test
 
         machine.spin(1, 5);
 
-        assertArrayEquals(
-            new String[] {"green"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"green"}, machine.configuration());
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba un paso negativo desde el inicio del catálogo. */
     @Test
     public void shouldRotateAWheelBackwards()
     {
@@ -169,13 +149,11 @@ public class SlotMachineC2Test
 
         machine.spin(1, -1);
 
-        assertArrayEquals(
-            new String[] {"green"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"green"}, machine.configuration());
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba el giro válido de cero pasos. */
     @Test
     public void shouldAcceptZeroStepsWithoutChangingTheWheel()
     {
@@ -183,13 +161,11 @@ public class SlotMachineC2Test
 
         machine.spin(1, 0);
 
-        assertArrayEquals(
-            new String[] {"red"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red"}, machine.configuration());
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba el cálculo con un entero muy grande. */
     @Test
     public void shouldRotateSafelyWithAVeryLargeStepCount()
     {
@@ -197,13 +173,11 @@ public class SlotMachineC2Test
 
         machine.spin(1, Integer.MAX_VALUE);
 
-        assertArrayEquals(
-            new String[] {"blue"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"blue"}, machine.configuration());
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba que varios pasos tampoco ignoren el bloqueo. */
     @Test
     public void shouldNotRotateSeveralStepsWhenWheelIsLocked()
     {
@@ -212,13 +186,11 @@ public class SlotMachineC2Test
 
         machine.spin(1, 2);
 
-        assertArrayEquals(
-            new String[] {"red"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red"}, machine.configuration());
         assertFalse(machine.ok());
     }
 
+    /** [P] Comprueba un destino completo válido. */
     @Test
     public void shouldReachARequestedConfiguration()
     {
@@ -226,13 +198,11 @@ public class SlotMachineC2Test
 
         machine.spin(new String[] {"green", "red", "blue"});
 
-        assertArrayEquals(
-            new String[] {"green", "red", "blue"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"green", "red", "blue"}, machine.configuration());
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba la normalización de cada destino. */
     @Test
     public void shouldNormalizeRequestedConfigurationSymbols()
     {
@@ -240,13 +210,11 @@ public class SlotMachineC2Test
 
         machine.spin(new String[] {" GREEN ", "RED", "Blue"});
 
-        assertArrayEquals(
-            new String[] {"green", "red", "blue"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"green", "red", "blue"}, machine.configuration());
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba un destino compatible con una rueda bloqueada. */
     @Test
     public void shouldReachConfigurationWhenLockedWheelAlreadyMatches()
     {
@@ -255,13 +223,11 @@ public class SlotMachineC2Test
 
         machine.spin(new String[] {"red", "green", "blue"});
 
-        assertArrayEquals(
-            new String[] {"red", "green", "blue"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red", "green", "blue"}, machine.configuration());
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba el rechazo de un destino incompatible con el bloqueo. */
     @Test
     public void shouldRejectConfigurationThatChangesALockedWheel()
     {
@@ -270,13 +236,11 @@ public class SlotMachineC2Test
 
         machine.spin(new String[] {"blue", "green", "red"});
 
-        assertArrayEquals(
-            new String[] {"red", "blue", "green"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red", "blue", "green"}, machine.configuration());
         assertFalse(machine.ok());
     }
 
+    /** [P] Comprueba que un color desconocido no deje cambios parciales. */
     @Test
     public void shouldRejectUnknownConfigurationAtomically()
     {
@@ -284,13 +248,11 @@ public class SlotMachineC2Test
 
         machine.spin(new String[] {"green", "cyan", "red"});
 
-        assertArrayEquals(
-            new String[] {"red", "blue", "green"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red", "blue", "green"}, machine.configuration());
         assertFalse(machine.ok());
     }
 
+    /** [P] Comprueba un destino nulo y otro de tamaño incorrecto. */
     @Test
     public void shouldRejectNullAndWrongSizedConfigurations()
     {
@@ -298,19 +260,14 @@ public class SlotMachineC2Test
 
         machine.spin((String[]) null);
         assertFalse(machine.ok());
-        assertArrayEquals(
-            new String[] {"red", "blue"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red", "blue"}, machine.configuration());
 
         machine.spin(new String[] {"red"});
         assertFalse(machine.ok());
-        assertArrayEquals(
-            new String[] {"red", "blue"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red", "blue"}, machine.configuration());
     }
 
+    /** [P] Comprueba que la configuración objetivo no se use para iniciar una rueda vacía. */
     @Test
     public void shouldRejectRequestedConfigurationWhenAWheelIsEmpty()
     {
@@ -323,6 +280,7 @@ public class SlotMachineC2Test
         assertFalse(machine.ok());
     }
 
+    /** [P] Prepara el catálogo [red, blue] y la configuración [red] para las pruebas que lo necesitan. */
     private void prepareOneConfiguredWheel()
     {
         machine.addSymbol(1, "red");
@@ -331,6 +289,7 @@ public class SlotMachineC2Test
         machine.placeSymbol(1, "red");
     }
 
+    /** [P] Prepara el catálogo [red, blue] y la configuración [red, blue] para las pruebas que lo necesitan. */
     private void prepareTwoConfiguredWheels()
     {
         machine.addSymbol(1, "red");
@@ -341,6 +300,7 @@ public class SlotMachineC2Test
         machine.placeSymbol(2, "blue");
     }
 
+    /** [P] Prepara el catálogo [red, blue, green] y la configuración [red] para las pruebas que lo necesitan. */
     private void prepareThreeSymbolsAndOneWheel()
     {
         machine.addSymbol(1, "red");
@@ -350,6 +310,7 @@ public class SlotMachineC2Test
         machine.placeSymbol(1, "red");
     }
 
+    /** [P] Prepara el catálogo [red, blue, green] y la configuración [red, blue, green] para las pruebas que lo necesitan. */
     private void prepareThreeConfiguredWheels()
     {
         machine.addSymbol(1, "red");

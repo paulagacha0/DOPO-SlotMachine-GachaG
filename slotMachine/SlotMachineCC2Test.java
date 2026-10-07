@@ -1,21 +1,14 @@
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Collective Cycle 2 tests prepared for the corresponding class wiki.
- * The method names identify the authors using their surname initials. The
- * team must publish or verify these cases in the wiki before the delivery.
- *
- * @author Paula Gacha and Diego Mojica
- * @version Cycle 2 complete collective tests
- */
+/** [P -> SM] Dos casos del ciclo 2 conservados como antecedentes. */
 public class SlotMachineCC2Test
 {
+    /** [P] Máquina que se prepara antes de cada prueba. */
     private SlotMachine machine;
 
+    /** [P] Prepara una máquina nueva e invisible antes de cada caso de prueba. */
     @Before
     public void setUp()
     {
@@ -23,6 +16,7 @@ public class SlotMachineCC2Test
         machine.makeInvisible();
     }
 
+    /** [P] Comprueba el giro general con una rueda bloqueada en un caso identificado por el equipo. */
     @Test
     public void accordingGgMdShouldKeepLockedWheelStillWhileSpinningAll()
     {
@@ -36,13 +30,11 @@ public class SlotMachineCC2Test
 
         machine.spin();
 
-        assertArrayEquals(
-            new String[] {"red", "blue"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red", "blue"}, machine.configuration());
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba que se rechace todo el destino cuando uno de sus colores es desconocido. */
     @Test
     public void accordingGgMdShouldRejectInvalidTargetWithoutPartialChanges()
     {
@@ -55,10 +47,7 @@ public class SlotMachineCC2Test
 
         machine.spin(new String[] {"blue", "cyan"});
 
-        assertArrayEquals(
-            new String[] {"red", "blue"},
-            machine.configuration()
-        );
+        assertArrayEquals(new String[] {"red", "blue"}, machine.configuration());
         assertFalse(machine.ok());
     }
 }

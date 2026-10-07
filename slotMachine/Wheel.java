@@ -1,239 +1,298 @@
+import java.util.ArrayList;
+
 /**
- * Represents one wheel of the slot machine. A new wheel is empty until the
- * machine explicitly places a symbol on it.
- *
- * The outer circle represents the wheel frame and the inner circle represents
- * its current color symbol. Both circles are reused from the shapes project.
- *
- * @author Paula Gacha and Diego Mojica
- * @version Cycle 2 complete implementation
+ * [W] Rueda normal; guarda la selección y los estados de sus símbolos.
+ * @author Paula Gacha (extensión del ciclo 4)
  */
 public class Wheel
 {
     private static final int NO_SYMBOL = -1;
-    private static final int OUTER_DIAMETER = 52;
-    private static final int INNER_DIAMETER = 42;
-    private static final int INNER_OFFSET = 5;
-    private static final String EMPTY_COLOR = "white";
-    private static final String NORMAL_FRAME_COLOR = "black";
-    private static final String JACKPOT_FRAME_COLOR = "yellow";
-
-    private int currentSymbolIndex;
+    private static final int OUTER_SIZE = 52;
+    private final ArrayList<Symbol> symbols;
     private final Circle frameCircle;
+    private final Circle backgroundCircle;
     private final Circle symbolCircle;
+    private final Object symbolLabel;
+    private int currentSymbolIndex;
     private int xPosition;
     private int yPosition;
-    private boolean isVisible;
-    private boolean hasJackpotAppearance;
-    private boolean isLocked;
+    private int position;
+    private boolean visible;
+    private boolean locked;
+    private boolean jackpot;
+    private Wheel leftWheel;
 
-    /**
-     * Creates an empty wheel at the requested position.
-     *
-     * @param x horizontal position of the wheel frame
-     * @param y vertical position of the wheel frame
-     */
+    /** [W -> CI] Crea el marco y el interior vacío, sin asignar un símbolo. */
     public Wheel(int x, int y)
     {
-        currentSymbolIndex = NO_SYMBOL;
+        symbols = new ArrayList<>();
         frameCircle = new Circle();
+        backgroundCircle = new Circle();
         symbolCircle = new Circle();
+        symbolLabel = new Object();
+        currentSymbolIndex = NO_SYMBOL;
         xPosition = x;
         yPosition = y;
-        isVisible = false;
-        hasJackpotAppearance = false;
-        isLocked = false;
-
-        frameCircle.changeSize(OUTER_DIAMETER);
-        frameCircle.changeColor(NORMAL_FRAME_COLOR);
-        symbolCircle.changeSize(INNER_DIAMETER);
-        symbolCircle.changeColor(EMPTY_COLOR);
-        frameCircle.moveHorizontal(x - 20);
-        frameCircle.moveVertical(y - 15);
-        symbolCircle.moveHorizontal(x + INNER_OFFSET - 20);
-        symbolCircle.moveVertical(y + INNER_OFFSET - 15);
     }
 
-    /**
-     * Assigns a symbol and its visual color to this wheel.
-     *
-     * @param symbolIndex index in the shared symbol catalog
-     * @param color color used to represent the symbol
-     */
-    public void setSymbol(int symbolIndex, String color)
+    /** [W] Identifica el tipo normal. */
+    public String getType()
     {
-        currentSymbolIndex = symbolIndex;
-        showSymbol(color);
+        return "normal";
     }
 
-    /**
-     * Changes only the visual color of the assigned symbol.
-     *
-     * @param color color to display
-     */
-    public void showSymbol(String color)
+    /** [W] Color del marco cuando no hay jackpot. */
+    protected String getFrameColor()
     {
-        symbolCircle.changeColor(color);
+        return "black";
     }
 
-    /**
-     * Removes the current symbol and restores the empty-wheel appearance.
-     */
-    public void clearSymbol()
+    /** [W] Guarda la vecina y el número, después de insertar o intercambiar. */
+    public void setPosition(int position, Wheel leftWheel)
     {
-        currentSymbolIndex = NO_SYMBOL;
-        symbolCircle.changeColor(EMPTY_COLOR);
+        this.position = position;
+        this.leftWheel = leftWheel;
     }
 
-    /**
-     * Rotates the stored symbol index using circular arithmetic.
-     *
-     * @param steps number of positions to move
-     * @param symbolCount number of symbols in the shared catalog
-     */
-    public void rotate(int steps, int symbolCount)
+    /** [W] Entrega la vecina a las subclases. */
+    protected Wheel getLeftWheel()
     {
-        if (!isLocked && hasSymbol() && symbolCount > 0) {
-            currentSymbolIndex = (int) Math.floorMod(
-                (long) currentSymbolIndex + steps,
-                (long) symbolCount
-            );
+        return leftWheel;
+    }
+
+    /** [W -> S] Inserta una copia para que cada rueda tenga su propio estado. */
+    public void addSymbol(int index, Symbol symbol)
+    {
+        symbols.add(index, symbol.copy());
+        if (hasSymbol() && currentSymbolIndex >= index) {
+            currentSymbolIndex++;
         }
     }
 
-    /**
-     * Locks this wheel so rotation operations leave it unchanged.
-     */
-    public void lock()
+    /** [W] Elimina el símbolo y ajusta el índice sin seleccionar otro. */
+    public void removeSymbol(int index)
     {
-        isLocked = true;
+        symbols.remove(index);
+        if (currentSymbolIndex == index) {
+            currentSymbolIndex = NO_SYMBOL;
+        } else if (currentSymbolIndex > index) {
+            currentSymbolIndex--;
+        }
+        refresh();
     }
 
-    /**
-     * Unlocks this wheel so it can rotate again.
-     */
-    public void unlock()
+    /** [W -> S] Selecciona un símbolo y aplica su reacción a la selección. */
+    public void setSymbol(int index)
     {
-        isLocked = false;
+        currentSymbolIndex = index;
+        symbols.get(index).onSelected(1);
+        refresh();
     }
 
-    /**
-     * Reports whether this wheel is locked.
-     *
-     * @return true when rotation is disabled for this wheel
-     */
-    public boolean isLocked()
+    /** [W] Deja el interior vacío. */
+    public void clearSymbol()
     {
-        return isLocked;
+        currentSymbolIndex = NO_SYMBOL;
+        refresh();
     }
 
-    /**
-     * Reports whether this wheel currently has an assigned symbol.
-     *
-     * @return true when a symbol has been placed
-     */
+    /** [W] Indica si existe un símbolo seleccionado. */
     public boolean hasSymbol()
     {
         return currentSymbolIndex != NO_SYMBOL;
     }
 
-    /**
-     * Returns the current index in the shared symbol catalog.
-     *
-     * @return symbol index or -1 when the wheel is empty
-     */
+    /** [W] Devuelve el índice actual; -1 significa vacío. */
     public int getCurrentSymbolIndex()
     {
         return currentSymbolIndex;
     }
 
-    /**
-     * Preserves the current symbol after a catalog insertion.
-     *
-     * @param insertedIndex zero-based inserted symbol index
-     */
-    public void adjustAfterSymbolInsertion(int insertedIndex)
+    /** [W -> S] Devuelve el tamaño del símbolo seleccionado, o cero si está vacío. */
+    public int getSymbolSize()
     {
-        if (hasSymbol() && currentSymbolIndex >= insertedIndex) {
-            currentSymbolIndex++;
-        }
+        return hasSymbol() ? symbols.get(currentSymbolIndex).getSize() : 0;
+    }
+
+    /** [W -> S] Consulta la visibilidad propia del símbolo, no la ventana. */
+    public boolean isSymbolVisible()
+    {
+        return hasSymbol() && symbols.get(currentSymbolIndex).isVisible();
+    }
+
+    /** [W] Una rueda normal necesita símbolo y estar desbloqueada para girar. */
+    public boolean canRotate()
+    {
+        return !locked && hasSymbol();
+    }
+
+    /** [W] El tipo normal conserva el sentido solicitado. */
+    protected long actualSteps(int steps)
+    {
+        return steps;
     }
 
     /**
-     * Preserves the current symbol after a catalog deletion, or empties the
-     * wheel when its displayed symbol was deleted.
-     *
-     * @param removedIndex zero-based removed symbol index
+     * [W -> S] Gira y actualiza los símbolos visitados, incluso en modo invisible.
+     * Cuenta vueltas completas para no repetir millones de pasos.
      */
-    public void adjustAfterSymbolRemoval(int removedIndex)
+    public void rotate(int steps, int symbolCount)
     {
-        if (currentSymbolIndex == removedIndex) {
-            clearSymbol();
-        } else if (currentSymbolIndex > removedIndex) {
-            currentSymbolIndex--;
-        }
-    }
-
-    /**
-     * Moves both visual circles to a new absolute position.
-     *
-     * @param x new horizontal position
-     * @param y new vertical position
-     */
-    public void moveTo(int x, int y)
-    {
-        int horizontalDistance = x - xPosition;
-        int verticalDistance = y - yPosition;
-
-        frameCircle.moveHorizontal(horizontalDistance);
-        frameCircle.moveVertical(verticalDistance);
-        symbolCircle.moveHorizontal(horizontalDistance);
-        symbolCircle.moveVertical(verticalDistance);
-
-        xPosition = x;
-        yPosition = y;
-    }
-
-    /**
-     * Makes the empty frame and current symbol visible.
-     */
-    public void makeVisible()
-    {
-        isVisible = true;
-        frameCircle.makeVisible();
-        symbolCircle.makeVisible();
-    }
-
-    /**
-     * Hides both visual circles.
-     */
-    public void makeInvisible()
-    {
-        symbolCircle.makeInvisible();
-        frameCircle.makeInvisible();
-        isVisible = false;
-    }
-
-    /**
-     * Changes the wheel frame so the complete machine looks different when it
-     * reaches a jackpot.
-     *
-     * @param jackpot true to show the winning appearance
-     */
-    public void setJackpotAppearance(boolean jackpot)
-    {
-        if (hasJackpotAppearance == jackpot) {
+        if (!canRotate() || symbolCount == 0 || steps == 0) {
             return;
         }
-
-        hasJackpotAppearance = jackpot;
-        String frameColor = jackpot
-            ? JACKPOT_FRAME_COLOR
-            : NORMAL_FRAME_COLOR;
-        frameCircle.changeColor(frameColor);
-
-        if (isVisible) {
-            symbolCircle.makeVisible();
+        long displacement = actualSteps(steps);
+        int direction = displacement > 0 ? 1 : -1;
+        long count = Math.abs(displacement);
+        long fullTurns = count / symbolCount;
+        int extraSteps = (int) (count % symbolCount);
+        for (int step = 0; step < symbolCount; step++) {
+            long visits = fullTurns;
+            if (step < extraSteps) {
+                visits++;
+            }
+            int from = Math.floorMod(currentSymbolIndex + direction * step, symbolCount);
+            int to = Math.floorMod(from + direction, symbolCount);
+            symbols.get(from).onSpin(visits);
+            symbols.get(to).onSelected(visits);
         }
+        currentSymbolIndex = (int) Math.floorMod(
+            currentSymbolIndex + displacement, (long) symbolCount);
+        refresh();
+    }
+
+    /** [W] Calcula los pasos para llegar a un destino; -1 indicaría imposible. */
+    public int stepsTo(int target, int total, int leftTarget)
+    {
+        return Math.floorMod(target - currentSymbolIndex, total);
+    }
+
+    /** [W -> S] Copia la selección y apariencia, conservando tipo y bloqueo propios. */
+    protected void copyState(Wheel source)
+    {
+        currentSymbolIndex = source.currentSymbolIndex;
+        if (source.hasSymbol()) {
+            symbols.set(currentSymbolIndex, source.symbols.get(currentSymbolIndex).copy());
+        }
+        refresh();
+    }
+
+    /** [W] El tipo normal permite bloquear. */
+    public boolean canBeLocked()
+    {
+        return true;
+    }
+
+    /** [W] El tipo normal permite intercambiar. */
+    public boolean canBeSwapped()
+    {
+        return true;
+    }
+
+    /** [W] El tipo normal permite eliminar. */
+    public boolean canBeRemoved()
+    {
+        return true;
+    }
+
+    /** [W] Bloquea solo si el tipo lo permite. */
+    public void lock()
+    {
+        if (canBeLocked()) {
+            locked = true;
+            refresh();
+        }
+    }
+
+    /** [W] Quita el bloqueo. */
+    public void unlock()
+    {
+        locked = false;
+        refresh();
+    }
+
+    /** [W] Consulta el bloqueo. */
+    public boolean isLocked()
+    {
+        return locked;
+    }
+
+    /** [W] Cambia la ubicación en pantalla. */
+    public void moveTo(int x, int y)
+    {
+        xPosition = x;
+        yPosition = y;
+        refresh();
+    }
+
+    /** [W -> CI, CV] Muestra esta rueda y sus etiquetas. */
+    public void makeVisible()
+    {
+        visible = true;
+        refresh();
+    }
+
+    /** [W -> CI, CV] Oculta el dibujo, sin cambiar el estado de un símbolo shy. */
+    public void makeInvisible()
+    {
+        if (visible) {
+            hideDrawing();
+        }
+        visible = false;
+    }
+
+    /** [W] Cambia el marco ganador, manteniendo la etiqueta del tipo. */
+    public void setJackpotAppearance(boolean jackpot)
+    {
+        if (this.jackpot != jackpot) {
+            this.jackpot = jackpot;
+            refresh();
+        }
+    }
+
+    /** [W -> CI, CV] Dibuja el marco, fondo blanco, símbolo centrado y etiquetas. */
+    private void refresh()
+    {
+        if (!visible) {
+            return;
+        }
+        hideDrawing();
+        frameCircle.changeSize(OUTER_SIZE);
+        frameCircle.changeColor(jackpot ? "yellow" : getFrameColor());
+        frameCircle.moveTo(xPosition, yPosition);
+        backgroundCircle.changeSize(Symbol.NORMAL_SIZE);
+        backgroundCircle.changeColor("white");
+        backgroundCircle.moveTo(xPosition + 5, yPosition + 5);
+        frameCircle.makeVisible();
+        backgroundCircle.makeVisible();
+        String detail = "vacia";
+        if (hasSymbol()) {
+            Symbol symbol = symbols.get(currentSymbolIndex);
+            int size = symbol.getSize();
+            symbolCircle.changeColor(symbol.getColor());
+            symbolCircle.changeSize(size);
+            int margin = (OUTER_SIZE - size) / 2;
+            symbolCircle.moveTo(xPosition + margin, yPosition + margin);
+            if (symbol.isVisible()) {
+                symbolCircle.makeVisible();
+            }
+            detail = symbol.getType() + ":" + size;
+            if (!symbol.isVisible()) {
+                detail = symbol.getType() + " oculto";
+            }
+        }
+        String title = position + " " + getType() + (locked ? " [B]" : "");
+        Canvas.getCanvas().drawText(this, title, xPosition - 4, yPosition + 66);
+        Canvas.getCanvas().drawText(symbolLabel, detail, xPosition - 4, yPosition + 80);
+    }
+
+    /** [W -> CI, CV] Retira las figuras y los dos textos de esta rueda. */
+    private void hideDrawing()
+    {
+        symbolCircle.makeInvisible();
+        backgroundCircle.makeInvisible();
+        frameCircle.makeInvisible();
+        Canvas.getCanvas().erase(this);
+        Canvas.getCanvas().erase(symbolLabel);
     }
 }

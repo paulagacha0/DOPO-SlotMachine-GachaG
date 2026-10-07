@@ -1,44 +1,42 @@
-Project "shapes"
-Authors: Michael Kolling and David J. Barnes
+SLOT MACHINE — CICLO 4 — PAULA GACHA
 
-This project is part of the material for the book
+Trabajo actual individual. Se conserva la historia del proyecto previo.
+Base: https://github.com/paulagacha0/DOPO-SlotMachine-GachaG
+Commit de partida: 01eb9cacbfe60aa635cd058e64298dce250b5abb
 
-   Objects First with Java - A Practical Introduction using BlueJ
-   David J. Barnes and Michael Kolling
-   Pearson Education, 2002
+PARA EMPEZAR
+1. Abra slotMachine/package.bluej con BlueJ y pulse Compilar.
+2. Ejecute Test All en cada una de las siete clases JUnit.
+3. Para la demostración manual cree new SlotMachine(), sin parámetros.
+4. Siga PRUEBAS_ACEPTACION_C4.md: tiene dos recorridos completos.
 
-It is discussed in chapter 1.
+NOVEDADES
+Ruedas: normal, lefty, rebel y reverse (tipo adicional propuesto).
+Símbolos: normal, ephemeral y shy.
+Las ruedas nuevas empiezan vacías. Los tipos tienen etiquetas visuales.
+Los métodos anteriores y el solucionador del concurso se conservan.
 
-This is a very simple project to demonstrate some characteristics of
-objects.
+DOCUMENTOS DE APOYO
+GUIA_CICLO4.md: requisitos, clases, etiquetas, lógica y preguntas.
+PRUEBAS_ACEPTACION_C4.md: entradas y resultados esperados en BlueJ.
+COMO_SUBIR_A_GIT.md: pasos para copiar la carpeta y subir los cambios.
+Los archivos .md son documentos de texto; GitHub los muestra con formato.
 
-You can create various shapes, and you will see, if you do, that those
-shapes are drawn on screen (in a window that we call the "canvas").
+VERIFICACIÓN
+21 archivos Java: 14 clases del programa y 7 de pruebas.
+71 casos aprobados con Java 17 y JUnit 4.13.2.
+El dibujo se comprobó en memoria con una adaptación temporal del lienzo,
+que NO forma parte de esta carpeta. Falta realizar los recorridos manuales
+en su instalación de BlueJ para verificar allí la ventana.
 
-You can then manipulate these objects: change their position, size and 
-colour. Try it out: create a few different squares, triangles and circles.
+ALCANCE
+Esta carpeta contiene BlueJ y sus pruebas. Astah y la retrospectiva final
+quedan para la siguiente revisión. SlotMachineCC4Test contiene dos casos
+preparados para compartir; falta realizar ese intercambio con el grupo.
+La entrega final también exige estos productos y el TXT para Moodle.
 
-This project is designed as a first example of object-oriented programming.
-It illustrates a number of concepts:
-
- - a Java project (application) is a collection of classes
- - objects can be created from classes
- - from any one class, many objects may be created
- - objects have operations (methods)
- - operations can have parameters
- - parameters have types (at least String and int)
- - objects hold data (fields)
- - the operations and fields are common to all objects
- - the values stored in the fields can be different for each object
-
-The project also demonstrates
-
- - BlueJ object creation
- - interactive method invocation
- - parameter passing
-
-A good second project to look at after this is "picture", which adds a class
-to those ones in this project. That class (named "Picture") uses the shapes
-to draw a picture. It can be used to experiment with coding.
-
-Michael Kolling, July 2000
+CRÉDITOS
+Ampliación del ciclo 4: Paula Gacha.
+Se conserva el historial del trabajo previo del repositorio.
+Las figuras proceden de shapes, de Michael Kölling y David J. Barnes,
+material de Objects First with Java — A Practical Introduction using BlueJ.

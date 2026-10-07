@@ -1,25 +1,14 @@
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Unit tests for the corrected Cycle 1 behavior.
- * Every test runs with the simulator in invisible mode.
- *
- * @author Paula Gacha and Diego Mojica
- * @version Cycle 1 corrected
- */
+/** [P -> SM] Pruebas sencillas del catálogo, la asignación y el giro. */
 public class SlotMachineC1Test
 {
+    /** [P] Máquina que se prepara antes de cada prueba. */
     private SlotMachine machine;
 
-    /**
-     * Creates an invisible machine before every test.
-     */
+    /** [P] Prepara una máquina nueva e invisible antes de cada caso de prueba. */
     @Before
     public void setUp()
     {
@@ -27,6 +16,7 @@ public class SlotMachineC1Test
         machine.makeInvisible();
     }
 
+    /** [P] Comprueba el estado inicial de la máquina. */
     @Test
     public void shouldCreateAnEmptyMachine()
     {
@@ -35,6 +25,7 @@ public class SlotMachineC1Test
         assertFalse(machine.isJackpot());
     }
 
+    /** [P] Comprueba que una rueda nueva comience vacía. */
     @Test
     public void shouldAddAnEmptyWheelWithoutDefaultSymbol()
     {
@@ -47,18 +38,17 @@ public class SlotMachineC1Test
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba que se respete la posición de inserción. */
     @Test
     public void shouldInsertSymbolsAtTheRequestedPositions()
     {
         machine.addSymbol(1, "red");
         machine.addSymbol(1, "blue");
 
-        assertArrayEquals(
-            new String[] {"blue", "red"},
-            machine.symbols()
-        );
+        assertArrayEquals(new String[] {"blue", "red"}, machine.symbols());
     }
 
+    /** [P] Comprueba la asignación de un símbolo conocido. */
     @Test
     public void shouldPlaceAnExistingSymbolOnAWheel()
     {
@@ -70,6 +60,7 @@ public class SlotMachineC1Test
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba que insertar un color no cambie el símbolo ya mostrado. */
     @Test
     public void shouldPreserveDisplayedSymbolAfterCatalogInsertion()
     {
@@ -82,6 +73,7 @@ public class SlotMachineC1Test
         assertArrayEquals(new String[] {"red"}, machine.configuration());
     }
 
+    /** [P] Comprueba que se vacíe la rueda al desaparecer su símbolo. */
     @Test
     public void shouldClearWheelWhenItsSymbolIsDeleted()
     {
@@ -95,6 +87,7 @@ public class SlotMachineC1Test
         assertFalse(machine.isJackpot());
     }
 
+    /** [P] Comprueba un giro de un paso. */
     @Test
     public void shouldRotateAnAssignedWheel()
     {
@@ -109,6 +102,7 @@ public class SlotMachineC1Test
         assertTrue(machine.ok());
     }
 
+    /** [P] Comprueba el rechazo de un giro sin símbolo inicial. */
     @Test
     public void shouldNotRotateAnEmptyWheel()
     {
@@ -121,6 +115,7 @@ public class SlotMachineC1Test
         assertFalse(machine.ok());
     }
 
+    /** [P] Comprueba que todas las ruedas deben estar configuradas para ganar. */
     @Test
     public void shouldDetectJackpotOnlyWhenEveryWheelHasTheSameSymbol()
     {
@@ -136,6 +131,7 @@ public class SlotMachineC1Test
         assertTrue(machine.isJackpot());
     }
 
+    /** [P] Comprueba dos entradas inválidas. */
     @Test
     public void shouldRejectInvalidPositionsAndDuplicateSymbols()
     {

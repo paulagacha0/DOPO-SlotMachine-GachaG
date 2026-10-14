@@ -2,7 +2,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-/** [P -> SM] Dos casos */
+/** [P -> SM] Dos casos de Paula Gacha preparados para compartir con el grupo. */
 public class SlotMachineCC4Test
 {
     private SlotMachine machine;
@@ -15,7 +15,7 @@ public class SlotMachineCC4Test
         machine.makeInvisible();
     }
 
-    /** [P] Al intercambiar ruedas, lefty debe reconocer su nueva vecina */
+    /** [P] Al intercambiar ruedas, lefty debe reconocer su nueva vecina. */
     @Test
     public void accordingGachaGShouldCopyTheNewNeighbor()
     {
@@ -33,7 +33,7 @@ public class SlotMachineCC4Test
         assertTrue(machine.ok());
     }
 
-    /** [P] Rechazar la eliminación de rebel conserva también el símbolo shy */
+    /** [P] Rechazar la eliminación de rebel conserva también el símbolo shy. */
     @Test
     public void accordingGachaGShouldKeepARebelAndItsSymbol()
     {

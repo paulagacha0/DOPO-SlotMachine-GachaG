@@ -2,7 +2,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-/** [P -> SM] Casos  */
+/** [P -> SM] Casos pequeños de los nuevos tipos. Autora: Paula Gacha. */
 public class SlotMachineC4Test
 {
     private SlotMachine machine;
@@ -29,7 +29,7 @@ public class SlotMachineC4Test
         assertEquals("reverse", machine.wheelType(4));
     }
 
-    /** [P] Agrega los tres tipos de símbolos al mismo catálogo */
+    /** [P] Agrega los tres tipos de símbolos al mismo catálogo. */
     @Test
     public void shouldAddAllSymbolTypes()
     {
@@ -40,7 +40,7 @@ public class SlotMachineC4Test
         assertTrue(machine.ok());
     }
 
-    /** [P] Lefty copia a su vecina, aunque se pidan varios pasos */
+    /** [P] Lefty copia a su vecina, aunque se pidan varios pasos. */
     @Test
     public void shouldCopyTheLeftWheel()
     {
@@ -53,7 +53,7 @@ public class SlotMachineC4Test
         assertArrayEquals(new String[] {"red", "red"}, machine.configuration());
     }
 
-    /** [P] Sin vecina, lefty funciona como una rueda normal */
+    /** [P] Sin vecina, lefty funciona como una rueda normal. */
     @Test
     public void shouldRotateLeftyWithoutANeighbor()
     {
@@ -64,7 +64,7 @@ public class SlotMachineC4Test
         assertEquals("blue", machine.configuration()[0]);
     }
 
-    /** [P] Una lefty vacía puede copiar un símbolo */
+    /** [P] Una lefty vacía puede copiar un símbolo. */
     @Test
     public void shouldFillAnEmptyLefty()
     {
@@ -76,7 +76,7 @@ public class SlotMachineC4Test
         assertEquals("green", machine.configuration()[1]);
     }
 
-    /** [P] Si la vecina está vacía, la copia queda vacía */
+    /** [P] Si la vecina está vacía, la copia queda vacía. */
     @Test
     public void shouldCopyAnEmptyNeighbor()
     {
@@ -89,7 +89,7 @@ public class SlotMachineC4Test
         assertTrue(machine.ok());
     }
 
-    /** [P] El giro general actualiza primero a la vecina izquierda */
+    /** [P] El giro general actualiza primero a la vecina izquierda. */
     @Test
     public void shouldSpinFromLeftToRight()
     {
@@ -102,7 +102,7 @@ public class SlotMachineC4Test
         assertArrayEquals(new String[] {"blue", "blue"}, machine.configuration());
     }
 
-    /** [P] El bloqueo también impide que lefty copie */
+    /** [P] El bloqueo también impide que lefty copie. */
     @Test
     public void shouldKeepALockedLeftyStill()
     {
@@ -117,7 +117,7 @@ public class SlotMachineC4Test
         assertEquals("blue", machine.configuration()[1]);
     }
 
-    /** [P] Rebel no acepta bloqueo */
+    /** [P] Rebel no acepta bloqueo. */
     @Test
     public void shouldNotLockARebel()
     {
@@ -127,7 +127,7 @@ public class SlotMachineC4Test
         assertFalse(machine.isLocked(1));
     }
 
-    /** [P] Rebel no acepta eliminación */
+    /** [P] Rebel no acepta eliminación. */
     @Test
     public void shouldNotDeleteARebel()
     {
@@ -137,7 +137,7 @@ public class SlotMachineC4Test
         assertEquals(1, machine.configuration().length);
     }
 
-    /** [P] Tampoco se puede intercambiar poniendo rebel como segunda rueda */
+    /** [P] Tampoco se puede intercambiar poniendo rebel como segunda rueda. */
     @Test
     public void shouldNotSwapWithARebel()
     {
@@ -148,7 +148,7 @@ public class SlotMachineC4Test
         assertEquals("rebel", machine.wheelType(2));
     }
 
-    /** [P] Rebel sí conserva el giro normal */
+    /** [P] Rebel sí conserva el giro normal. */
     @Test
     public void shouldSpinARebel()
     {
@@ -159,7 +159,7 @@ public class SlotMachineC4Test
         assertEquals("blue", machine.configuration()[0]);
     }
 
-    /** [P] Reverse retrocede cuando se solicita avanzar */
+    /** [P] Reverse retrocede cuando se solicita avanzar. */
     @Test
     public void shouldRotateInReverse()
     {
@@ -172,7 +172,7 @@ public class SlotMachineC4Test
         assertEquals("red", machine.configuration()[0]);
     }
 
-    /** [P] Con un solo símbolo se observa la reducción*/
+    /** [P] Con un solo símbolo se observa directamente la reducción. */
     @Test
     public void shouldShrinkAnEphemeral()
     {
@@ -183,7 +183,7 @@ public class SlotMachineC4Test
         assertEquals(36, machine.symbolSize(1));
     }
 
-    /** [P] El símbolo efímero nunca desaparece por tamaño */
+    /** [P] El símbolo efímero nunca desaparece por tamaño. */
     @Test
     public void shouldStopShrinkingAtAPoint()
     {
@@ -194,7 +194,7 @@ public class SlotMachineC4Test
         assertEquals(6, machine.symbolSize(1));
     }
 
-    /** [P] Girar una rueda no reduce el símbolo de otra */
+    /** [P] Girar una rueda no reduce el símbolo de otra. */
     @Test
     public void shouldKeepIndependentSizes()
     {
@@ -208,7 +208,7 @@ public class SlotMachineC4Test
         assertEquals(42, machine.symbolSize(2));
     }
 
-    /** [P] El tamaño se conserva al salir del símbolo y regresar a él */
+    /** [P] El tamaño se conserva al salir del símbolo y regresar a él. */
     @Test
     public void shouldRememberAnEphemeralSize()
     {
@@ -221,7 +221,7 @@ public class SlotMachineC4Test
         assertEquals(36, machine.symbolSize(1));
     }
 
-    /** [P] Shy aparece, se oculta y aparece al seleccionarlo */
+    /** [P] Shy aparece, se oculta y aparece al seleccionarlo. */
     @Test
     public void shouldAlternateAShySymbol()
     {
@@ -235,7 +235,7 @@ public class SlotMachineC4Test
         assertTrue(machine.isSymbolVisible(1));
     }
 
-    /** [P] Shy oculto sigue siendo un símbolo asignado */
+    /** [P] Shy oculto sigue siendo un símbolo asignado. */
     @Test
     public void shouldKeepAHiddenSymbolAssigned()
     {
@@ -248,7 +248,7 @@ public class SlotMachineC4Test
         assertTrue(machine.isJackpot());
     }
 
-    /** [P] Cero pasos no reduce ni cambia la visibilidad */
+    /** [P] Cero pasos no reduce ni cambia la visibilidad. */
     @Test
     public void shouldKeepSymbolsUnchangedWithZeroSteps()
     {
@@ -260,7 +260,7 @@ public class SlotMachineC4Test
         assertTrue(machine.ok());
     }
 
-    /** [P] Lefty copia también el tamaño que tiene la vecina */
+    /** [P] Lefty copia también el tamaño que tiene la vecina. */
     @Test
     public void shouldCopyTheEphemeralSize()
     {
@@ -273,7 +273,7 @@ public class SlotMachineC4Test
         assertEquals(30, machine.symbolSize(2));
     }
 
-    /** [P] Lefty copia la visibilidad sin volver a seleccionar el símbolo */
+    /** [P] Lefty copia la visibilidad sin volver a seleccionar el símbolo. */
     @Test
     public void shouldCopyAShyState()
     {
@@ -287,7 +287,7 @@ public class SlotMachineC4Test
         assertEquals("green", machine.configuration()[1]);
     }
 
-    /** [P] Elimina un símbolo especial sin asignar otro por defecto */
+    /** [P] Elimina un símbolo especial sin asignar otro por defecto. */
     @Test
     public void shouldDeleteASpecialSymbol()
     {
@@ -299,7 +299,7 @@ public class SlotMachineC4Test
         assertEquals(0, machine.symbolSize(1));
     }
 
-    /** [P] Rechaza nombres de tipos que no existen */
+    /** [P] Rechaza nombres de tipos que no existen. */
     @Test
     public void shouldRejectUnknownTypes()
     {
@@ -311,7 +311,7 @@ public class SlotMachineC4Test
         assertEquals(0, machine.symbols().length);
     }
 
-    /** [P] El color sigue siendo único, aunque el tipo sea diferente */
+    /** [P] El color sigue siendo único, aunque el tipo sea diferente. */
     @Test
     public void shouldRejectRepeatedColorsAcrossTypes()
     {
@@ -321,7 +321,7 @@ public class SlotMachineC4Test
         assertEquals(1, machine.symbols().length);
     }
 
-    /** [P] La configuración objetivo también funciona con reverse y lefty */
+    /** [P] La configuración objetivo también funciona con reverse y lefty. */
     @Test
     public void shouldReachATargetWithSpecialWheels()
     {
@@ -335,7 +335,7 @@ public class SlotMachineC4Test
         assertTrue(machine.ok());
     }
 
-    /** [P] Un destino imposible para lefty no modifica ninguna rueda */
+    /** [P] Un destino imposible para lefty no modifica ninguna rueda. */
     @Test
     public void shouldRejectAnImpossibleLeftyTarget()
     {
@@ -349,7 +349,7 @@ public class SlotMachineC4Test
         assertArrayEquals(new String[] {"red", "blue"}, machine.configuration());
     }
 
-    /** [P] Prepara un catálogo pequeño para las pruebas de giro */
+    /** [P] Prepara un catálogo pequeño para las pruebas de giro. */
     private void addThreeSymbols()
     {
         machine.addSymbol(1, "red");

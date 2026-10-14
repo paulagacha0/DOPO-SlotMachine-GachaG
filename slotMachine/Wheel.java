@@ -1,8 +1,7 @@
 import java.util.ArrayList;
 
 /**
- * [W] Rueda normal; guarda la selección y los estados de sus símbolos.
- * @author Paula Gacha (extensión del ciclo 4)
+ * [W] Rueda normal; guarda la selección y los estados de sus símbolos
  */
 public class Wheel
 {

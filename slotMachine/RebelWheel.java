@@ -30,7 +30,7 @@ public class RebelWheel extends Wheel
         return false;
     }
 
-    /** [RW] Impide intercambiar esta rueda. */
+    /** [RW] Impide intercambiar esta rueda */
     @Override
     public boolean canBeSwapped()
     {

@@ -1,11 +1,10 @@
-/** [SS -> S] Alterna su visibilidad cada vez que se selecciona.
- * @author Paula Gacha
+/** [SS -> S] Alterna su visibilidad cada vez que se selecciona
  */
 public class ShySymbol extends Symbol
 {
     private boolean visible;
 
-    /** [SS -> S] La primera selección lo hará visible. */
+    /** [SS -> S] La primera selección lo hará visible */
     public ShySymbol(String color)
     {
         super(color);
@@ -19,14 +18,14 @@ public class ShySymbol extends Symbol
         return "shy";
     }
 
-    /** [SS] Devuelve la visibilidad propia del símbolo. */
+    /** [SS] Devuelve la visibilidad propia del símbolo */
     @Override
     public boolean isVisible()
     {
         return visible;
     }
 
-    /** [SS] Un número impar de selecciones invierte el estado. */
+    /** [SS] Un número impar de selecciones invierte el estado */
     @Override
     public void onSelected(long times)
     {
@@ -35,7 +34,7 @@ public class ShySymbol extends Symbol
         }
     }
 
-    /** [SS] Copia el color y la visibilidad actual. */
+    /** [SS] Copia el color y la visibilidad actual */
     @Override
     public Symbol copy()
     {

@@ -4,8 +4,7 @@ import java.util.Random;
 import javax.swing.JOptionPane;
 
 /**
- * [SM] Coordina ruedas, catálogo, validaciones y visibilidad.
- * @author Paula Gacha (extensión del ciclo 4)
+ * [SM] Coordina ruedas, catálogo, validaciones y visibilidad
  */
 public class SlotMachine
 {
@@ -32,7 +31,7 @@ public class SlotMachine
     }
 
     /**
-     * [SM -> COL, W] Crea n ruedas normales con símbolos normales al azar.
+     * [SM -> COL, W] Crea n ruedas normales con símbolos normales al azar
      * @param n cantidad de ruedas y símbolos, entre 3 y 50
      * @throws IllegalArgumentException si el tamaño no está permitido
      */
@@ -58,14 +57,14 @@ public class SlotMachine
         updateJackpotAppearance();
     }
 
-    /** [SM] Conserva la operación anterior: agrega una rueda normal. */
+    /** [SM] Conserva la operación anterior: agrega una rueda normal*/
     public void addWheel(int pos)
     {
         addWheel("normal", pos);
     }
 
     /**
-     * [SM -> W] Agrega una rueda del tipo indicado, inicialmente vacía.
+     * [SM -> W] Agrega una rueda del tipo indicado, inicialmente vacía
      * @param type normal, lefty, rebel o reverse
      * @param pos posición desde 1 hasta la cantidad de ruedas más 1
      */
@@ -95,7 +94,7 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM -> W] Elimina la rueda si su tipo lo permite. */
+    /** [SM -> W] Elimina la rueda si su tipo lo permite */
     public void delWheel(int pos)
     {
         if (!ensureRunning() || !checkWheel(pos)) {
@@ -113,7 +112,7 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM -> W] Intercambia los objetos completos, si ambos tipos lo permiten. */
+    /** [SM -> W] Intercambia los objetos completos si ambos tipos lo permiten */
     public void swap(int wheel1, int wheel2)
     {
         if (!ensureRunning() || !checkWheel(wheel1) || !checkWheel(wheel2)) {
@@ -132,7 +131,7 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM -> W] Bloquea una rueda que acepte bloqueo. */
+    /** [SM -> W] Bloquea una rueda que acepte bloqueo */
     public void lock(int wheel)
     {
         if (!ensureRunning() || !checkWheel(wheel)) {
@@ -147,7 +146,7 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM -> W] Desbloquea una rueda previamente bloqueada. */
+    /** [SM -> W] Desbloquea una rueda previamente bloqueada */
     public void unlock(int wheel)
     {
         if (!ensureRunning() || !checkWheel(wheel)) {
@@ -162,14 +161,14 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM] Conserva la operación anterior: agrega un símbolo normal. */
+    /** [SM] Conserva la operación anterior: agrega un símbolo normal */
     public void addSymbol(int pos, String color)
     {
         addSymbol("normal", pos, color);
     }
 
     /**
-     * [SM -> S, W] Agrega el símbolo al catálogo y una copia a cada rueda.
+     * [SM -> S, W] Agrega el símbolo al catálogo y una copia a cada rueda
      * @param type normal, ephemeral o shy
      * @param pos posición desde 1 hasta la cantidad de símbolos más 1
      * @param color color único del símbolo; el blanco se reserva para el vacío
@@ -200,7 +199,7 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM -> W] Elimina el símbolo y vacía las ruedas que lo tenían seleccionado. */
+    /** [SM -> W] Elimina el símbolo y vacía las ruedas que lo tenían seleccionado */
     public void delSymbol(String symbol)
     {
         if (!ensureRunning()) {
@@ -219,7 +218,7 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM -> W] Selecciona directamente un símbolo; shy alterna su visibilidad. */
+    /** [SM -> W] Selecciona directamente un símbolo, shy alterna su visibilidad */
     public void placeSymbol(int wheel, String symbol)
     {
         if (!ensureRunning() || !checkWheel(wheel)) {
@@ -235,13 +234,13 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM] Gira una rueda un paso. */
+    /** [SM] Gira una rueda un paso */
     public void spin(int wheel)
     {
         spin(wheel, 1);
     }
 
-    /** [SM -> W] Valida y solicita un giro; cada tipo decide cómo realizarlo. */
+    /** [SM -> W] Valida y solicita un giro cada tipo decide cómo realizarlo */
     public void spin(int wheel, int steps)
     {
         if (!ensureRunning() || !checkWheel(wheel)) {
@@ -257,7 +256,7 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM -> W] Gira de izquierda a derecha; lefty copia la vecina ya actualizada. */
+    /** [SM -> W] Gira de izquierda a derecha, lefty copia la vecina ya actualizada */
     public void spin()
     {
         if (!ensureRunning()) {
@@ -290,7 +289,7 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM -> W] Primero planea todos los giros; rechaza destinos imposibles sin cambiar nada. */
+    /** [SM -> W] Primero planea todos los giros rechaza destinos imposibles sin cambiar nada */
     public void spin(String[] setSymbols)
     {
         if (!ensureRunning()) {
@@ -332,7 +331,7 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM -> S] Devuelve los colores del catálogo en orden. */
+    /** [SM -> S] Devuelve los colores del catálogo en orden */
     public String[] symbols()
     {
         String[] result = new String[symbols.size()];
@@ -342,7 +341,7 @@ public class SlotMachine
         return result;
     }
 
-    /** [SM -> W] Devuelve los colores asignados, aunque shy esté oculto; null significa vacío. */
+    /** [SM -> W] Devuelve los colores asignadosaunque shy esté oculto null significa vacío. */
     public String[] configuration()
     {
         String[] result = new String[wheels.size()];
@@ -355,7 +354,7 @@ public class SlotMachine
         return result;
     }
 
-    /** [SM] Cuenta símbolos asignados diferentes, sin contar las ruedas vacías. */
+    /** [SM] Cuenta símbolos asignados diferentes sin contar las ruedas vacías*/
     public int distinctSymbols()
     {
         ArrayList<String> distinct = new ArrayList<>();
@@ -367,37 +366,37 @@ public class SlotMachine
         return distinct.size();
     }
 
-    /** [SM] Comprueba que todas las ruedas tengan el mismo símbolo asignado. */
+    /** [SM] Comprueba que todas las ruedas tengan el mismo símbolo asignado */
     public boolean isJackpot()
     {
         return hasJackpot();
     }
 
-    /** [SM -> W] Consulta el diámetro actual del símbolo; cero si está vacío. */
+    /** [SM -> W] Consulta el diámetro actual del símbolo cero si está vacío */
     public int symbolSize(int wheel)
     {
         return getWheel(wheel).getSymbolSize();
     }
 
-    /** [SM -> W] Consulta si el símbolo permite dibujarse, independientemente de la ventana. */
+    /** [SM -> W] Consulta si el símbolo permite dibujarse independientemente de la ventana */
     public boolean isSymbolVisible(int wheel)
     {
         return getWheel(wheel).isSymbolVisible();
     }
 
-    /** [SM -> W] Devuelve el tipo de una rueda. */
+    /** [SM -> W] Devuelve el tipo de una rueda */
     public String wheelType(int wheel)
     {
         return getWheel(wheel).getType();
     }
 
-    /** [SM -> W] Consulta el bloqueo de una rueda. */
+    /** [SM -> W] Consulta el bloqueo de una rueda */
     public boolean isLocked(int wheel)
     {
         return getWheel(wheel).isLocked();
     }
 
-    /** [SM -> W] Muestra la máquina sin volver a seleccionar sus símbolos. */
+    /** [SM -> W] Muestra la máquina sin volver a seleccionar sus símbolos */
     public void makeVisible()
     {
         if (!ensureRunning()) {
@@ -411,7 +410,7 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM -> W, CV] Oculta la máquina conservando su estado. */
+    /** [SM -> W, CV] Oculta la máquina conservando su estado */
     public void makeInvisible()
     {
         if (!ensureRunning()) {
@@ -425,7 +424,7 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM] Oculta la máquina y termina la recepción de órdenes. */
+    /** [SM] Oculta la máquina y termina la recepción de órdenes */
     public void exit()
     {
         if (!ensureRunning()) {
@@ -436,13 +435,13 @@ public class SlotMachine
         successful = true;
     }
 
-    /** [SM] Devuelve si el último comando fue válido; las consultas no lo cambian. */
+    /** [SM] Devuelve si el último comando fue válido las consultas no lo cambian */
     public boolean ok()
     {
         return successful;
     }
 
-    /** [SM] Valida que el simulador siga activo. */
+    /** [SM] Valida que el simulador siga activo */
     private boolean ensureRunning()
     {
         if (!running) {
@@ -451,7 +450,7 @@ public class SlotMachine
         return running;
     }
 
-    /** [SM] Valida una posición externa de rueda. */
+    /** [SM] Valida una posición externa de rueda */
     private boolean checkWheel(int wheel)
     {
         if (wheel < 1 || wheel > wheels.size()) {
@@ -461,7 +460,7 @@ public class SlotMachine
         return true;
     }
 
-    /** [SM] Obtiene una rueda para las consultas, sin modificar ok. */
+    /** [SM] Obtiene una rueda para las consultas sin modificar ok */
     private Wheel getWheel(int wheel)
     {
         if (wheel < 1 || wheel > wheels.size()) {
@@ -470,7 +469,7 @@ public class SlotMachine
         return wheels.get(wheel - 1);
     }
 
-    /** [SM -> COL, S] Busca por color en el catálogo. */
+    /** [SM -> COL, S] Busca por color en el catálogo */
     private int findSymbol(String color)
     {
         String normalized = SymbolColors.normalize(color);
@@ -482,13 +481,13 @@ public class SlotMachine
         return -1;
     }
 
-    /** [SM] Normaliza el nombre del tipo. */
+    /** [SM] Normaliza el nombre del tipo */
     private String normalizeType(String type)
     {
         return type == null ? "" : type.trim().toLowerCase(Locale.ROOT);
     }
 
-    /** [SM -> W, LW, RW, VW] Elige la clase al crear; los giros usan polimorfismo. */
+    /** [SM -> W, LW, RW, VW] Elige la clase al crear los giros usan polimorfismo */
     private Wheel createWheel(String type)
     {
         String name = normalizeType(type);
@@ -507,7 +506,7 @@ public class SlotMachine
         return null;
     }
 
-    /** [SM -> S, ES, SS] Elige el tipo de símbolo al crearlo. */
+    /** [SM -> S, ES, SS] Elige el tipo de símbolo al crearlo */
     private Symbol createSymbol(String type, String color)
     {
         String name = normalizeType(type);
@@ -523,7 +522,7 @@ public class SlotMachine
         return null;
     }
 
-    /** [SM -> W] Actualiza posición y vecina; izquierda significa anterior en la lista. */
+    /** [SM -> W] Actualiza posición y vecina, izquierda significa anterior en la lista */
     private void arrangeWheels()
     {
         for (int i = 0; i < wheels.size(); i++) {
@@ -535,7 +534,7 @@ public class SlotMachine
         }
     }
 
-    /** [SM -> W, CV] Anima giros pequeños; los grandes se calculan directamente. */
+    /** [SM -> W, CV] Anima giros pequeños,los grandes se calculan directamente */
     private void rotateWheelBySteps(Wheel wheel, int steps)
     {
         long count = Math.abs((long) steps);
@@ -551,7 +550,7 @@ public class SlotMachine
         }
     }
 
-    /** [SM -> W] Ganar exige al menos una rueda y ninguna vacía. */
+    /** [SM -> W] Ganar exige al menos una rueda y ninguna vacía */
     private boolean hasJackpot()
     {
         if (wheels.isEmpty() || !wheels.get(0).hasSymbol()) {
@@ -566,7 +565,7 @@ public class SlotMachine
         return true;
     }
 
-    /** [SM -> W] Aplica el marco amarillo si hay jackpot. */
+    /** [SM -> W] Aplica el marco amarillo si hay jackpot */
     private void updateJackpotAppearance()
     {
         boolean jackpot = hasJackpot();
@@ -575,7 +574,7 @@ public class SlotMachine
         }
     }
 
-    /** [SM] Registra el fallo; solo muestra mensajes si la máquina está visible. */
+    /** [SM] Registra el fallo, solo muestra mensajes si la máquina está visible */
     private void fail(String message)
     {
         successful = false;

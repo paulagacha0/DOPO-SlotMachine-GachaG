@@ -1,5 +1,4 @@
 /** [LW -> W] Al girar copia el símbolo y la apariencia de su vecina izquierda.
- * @author Paula Gacha
  */
 public class LeftyWheel extends Wheel
 {
@@ -23,14 +22,14 @@ public class LeftyWheel extends Wheel
         return "blue";
     }
 
-    /** [LW] Puede copiar incluso si ella o su vecina están vacías. */
+    /** [LW] Puede copiar asi ella o su vecina estan vacias */
     @Override
     public boolean canRotate()
     {
         return !isLocked() && (getLeftWheel() != null || hasSymbol());
     }
 
-    /** [LW -> W] Sin vecina gira normalmente; con vecina copia su estado. */
+    /** [LW -> W] Sin vecina gira normal, con vecina copia su estado */
     @Override
     public void rotate(int steps, int symbolCount)
     {
@@ -44,7 +43,7 @@ public class LeftyWheel extends Wheel
         }
     }
 
-    /** [LW] Comprueba si el destino se logra quedándose quieta o copiando. */
+    /** [LW] Comprueba si el destino se logra quedándose quieta o copiando */
     @Override
     public int stepsTo(int target, int total, int leftTarget)
     {

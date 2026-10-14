@@ -1,5 +1,4 @@
-/** [ES -> S] Pierde tamaño al girar hasta quedar como un punto.
- * @author Paula Gacha
+/** [ES -> S] Pierde tamaño al girar hasta quedar como un punto
  */
 public class EphemeralSymbol extends Symbol
 {

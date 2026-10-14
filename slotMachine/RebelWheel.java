@@ -1,29 +1,28 @@
-/** [RW -> W] Gira normalmente, pero rechaza bloqueo, intercambio y eliminación.
- * @author Paula Gacha
+/** [RW -> W] Gira normal pero rechaza bloqueo, intercambio y eliminación
  */
 public class RebelWheel extends Wheel
 {
-    /** [RW -> W] Construye una rueda vacía. */
+    /** [RW -> W] Construye una rueda vacía */
     public RebelWheel(int x, int y)
     {
         super(x, y);
     }
 
-    /** [RW] Identifica el tipo. */
+    /** [RW] Identifica el tipo */
     @Override
     public String getType()
     {
         return "rebel";
     }
 
-    /** [RW] Usa un marco rojo. */
+    /** [RW] Usa un marco rojo*/
     @Override
     protected String getFrameColor()
     {
         return "red";
     }
 
-    /** [RW] Impide bloquear esta rueda. */
+    /** [RW] Impide bloquear esta rueda */
     @Override
     public boolean canBeLocked()
     {
@@ -37,7 +36,7 @@ public class RebelWheel extends Wheel
         return false;
     }
 
-    /** [RW] Impide eliminar esta rueda. */
+    /** [RW] Impide eliminar esta rueda */
     @Override
     public boolean canBeRemoved()
     {

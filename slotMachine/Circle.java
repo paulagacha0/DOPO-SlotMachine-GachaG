@@ -162,7 +162,7 @@ public class Circle{
         color = newColor;
         draw();
     }
-    /** [CI] Ubica el círculo usando coordenadas absolutas. */
+    /** [CI] Ubica el círculo usando coordenadas absolutas */
     public void moveTo(int x, int y){
         erase();
         xPosition = x;

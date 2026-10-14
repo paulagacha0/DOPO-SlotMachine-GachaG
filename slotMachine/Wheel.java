@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 /**
- * [W] Rueda normal; guarda la selección y los estados de sus símbolos
+ * [W] Rueda normal: guarda la selección y los estados de sus símbolos
  */
 public class Wheel
 {
@@ -21,7 +21,7 @@ public class Wheel
     private boolean jackpot;
     private Wheel leftWheel;
 
-    /** [W -> CI] Crea el marco y el interior vacío, sin asignar un símbolo. */
+    /** [W -> CI] Crea el marco y el interior vacío sin asignar un símbolo */
     public Wheel(int x, int y)
     {
         symbols = new ArrayList<>();
@@ -34,32 +34,32 @@ public class Wheel
         yPosition = y;
     }
 
-    /** [W] Identifica el tipo normal. */
+    /** [W] Identifica el tipo normal */
     public String getType()
     {
         return "normal";
     }
 
-    /** [W] Color del marco cuando no hay jackpot. */
+    /** [W] Color del marco cuando no hay jackpot */
     protected String getFrameColor()
     {
         return "black";
     }
 
-    /** [W] Guarda la vecina y el número, después de insertar o intercambiar. */
+    /** [W] Guarda la vecina y el númer después de insertar o intercambiar */
     public void setPosition(int position, Wheel leftWheel)
     {
         this.position = position;
         this.leftWheel = leftWheel;
     }
 
-    /** [W] Entrega la vecina a las subclases. */
+    /** [W] Entrega la vecina a las subclases */
     protected Wheel getLeftWheel()
     {
         return leftWheel;
     }
 
-    /** [W -> S] Inserta una copia para que cada rueda tenga su propio estado. */
+    /** [W -> S] Inserta una copia para que cada rueda tenga su propio estado */
     public void addSymbol(int index, Symbol symbol)
     {
         symbols.add(index, symbol.copy());
@@ -68,7 +68,7 @@ public class Wheel
         }
     }
 
-    /** [W] Elimina el símbolo y ajusta el índice sin seleccionar otro. */
+    /** [W] Elimina el símbolo y ajusta el índice sin seleccionar otro */
     public void removeSymbol(int index)
     {
         symbols.remove(index);
@@ -80,7 +80,7 @@ public class Wheel
         refresh();
     }
 
-    /** [W -> S] Selecciona un símbolo y aplica su reacción a la selección. */
+    /** [W -> S] Selecciona un símbolo y aplica su reacción a la selección */
     public void setSymbol(int index)
     {
         currentSymbolIndex = index;
@@ -88,52 +88,52 @@ public class Wheel
         refresh();
     }
 
-    /** [W] Deja el interior vacío. */
+    /** [W] Deja el interior vacío */
     public void clearSymbol()
     {
         currentSymbolIndex = NO_SYMBOL;
         refresh();
     }
 
-    /** [W] Indica si existe un símbolo seleccionado. */
+    /** [W] Indica si existe un símbolo seleccionado */
     public boolean hasSymbol()
     {
         return currentSymbolIndex != NO_SYMBOL;
     }
 
-    /** [W] Devuelve el índice actual; -1 significa vacío. */
+    /** [W] Devuelve el índice actual; -1 significa vacío */
     public int getCurrentSymbolIndex()
     {
         return currentSymbolIndex;
     }
 
-    /** [W -> S] Devuelve el tamaño del símbolo seleccionado, o cero si está vacío. */
+    /** [W -> S] Devuelve el tamaño del símbolo seleccionado o cero si está vacío */
     public int getSymbolSize()
     {
         return hasSymbol() ? symbols.get(currentSymbolIndex).getSize() : 0;
     }
 
-    /** [W -> S] Consulta la visibilidad propia del símbolo, no la ventana. */
+    /** [W -> S] Consulta la visibilidad propia del símbolo no la ventana */
     public boolean isSymbolVisible()
     {
         return hasSymbol() && symbols.get(currentSymbolIndex).isVisible();
     }
 
-    /** [W] Una rueda normal necesita símbolo y estar desbloqueada para girar. */
+    /** [W] Una rueda normal necesita símbolo y estar desbloqueada para girar */
     public boolean canRotate()
     {
         return !locked && hasSymbol();
     }
 
-    /** [W] El tipo normal conserva el sentido solicitado. */
+    /** [W] El tipo normal conserva el sentido solicitado */
     protected long actualSteps(int steps)
     {
         return steps;
     }
 
     /**
-     * [W -> S] Gira y actualiza los símbolos visitados, incluso en modo invisible.
-     * Cuenta vueltas completas para no repetir millones de pasos.
+     * [W -> S] Gira y actualiza los símbolos visitados incluso en modo invisible
+     * Cuenta vueltas completas para no repetirmuchos pasos
      */
     public void rotate(int steps, int symbolCount)
     {
@@ -160,13 +160,13 @@ public class Wheel
         refresh();
     }
 
-    /** [W] Calcula los pasos para llegar a un destino; -1 indicaría imposible. */
+    /** [W] Calcula los pasos para llegar a un destino; -1 indicaría imposible */
     public int stepsTo(int target, int total, int leftTarget)
     {
         return Math.floorMod(target - currentSymbolIndex, total);
     }
 
-    /** [W -> S] Copia la selección y apariencia, conservando tipo y bloqueo propios. */
+    /** [W -> S] Copia la selección y apariencia conservando tipo y bloqueo propios */
     protected void copyState(Wheel source)
     {
         currentSymbolIndex = source.currentSymbolIndex;
@@ -176,25 +176,25 @@ public class Wheel
         refresh();
     }
 
-    /** [W] El tipo normal permite bloquear. */
+    /** [W] El tipo normal permite bloquear */
     public boolean canBeLocked()
     {
         return true;
     }
 
-    /** [W] El tipo normal permite intercambiar. */
+    /** [W] El tipo normal permite intercambiar */
     public boolean canBeSwapped()
     {
         return true;
     }
 
-    /** [W] El tipo normal permite eliminar. */
+    /** [W] El tipo normal permite eliminar */
     public boolean canBeRemoved()
     {
         return true;
     }
 
-    /** [W] Bloquea solo si el tipo lo permite. */
+    /** [W] Bloquea solo si el tipo lo permite */
     public void lock()
     {
         if (canBeLocked()) {
@@ -203,20 +203,20 @@ public class Wheel
         }
     }
 
-    /** [W] Quita el bloqueo. */
+    /** [W] Quita el bloqueo */
     public void unlock()
     {
         locked = false;
         refresh();
     }
 
-    /** [W] Consulta el bloqueo. */
+    /** [W] Consulta el bloqueo */
     public boolean isLocked()
     {
         return locked;
     }
 
-    /** [W] Cambia la ubicación en pantalla. */
+    /** [W] Cambia la ubicación en pantalla */
     public void moveTo(int x, int y)
     {
         xPosition = x;
@@ -224,14 +224,14 @@ public class Wheel
         refresh();
     }
 
-    /** [W -> CI, CV] Muestra esta rueda y sus etiquetas. */
+    /** [W -> CI, CV] Muestra esta rueda y sus etiquetas */
     public void makeVisible()
     {
         visible = true;
         refresh();
     }
 
-    /** [W -> CI, CV] Oculta el dibujo, sin cambiar el estado de un símbolo shy. */
+    /** [W -> CI, CV] Oculta el dibujo, sin cambiar el estado de un símbolo shy */
     public void makeInvisible()
     {
         if (visible) {
@@ -240,7 +240,7 @@ public class Wheel
         visible = false;
     }
 
-    /** [W] Cambia el marco ganador, manteniendo la etiqueta del tipo. */
+    /** [W] Cambia el marco ganador manteniendo la etiqueta del tipo. */
     public void setJackpotAppearance(boolean jackpot)
     {
         if (this.jackpot != jackpot) {
@@ -249,7 +249,7 @@ public class Wheel
         }
     }
 
-    /** [W -> CI, CV] Dibuja el marco, fondo blanco, símbolo centrado y etiquetas. */
+    /** [W -> CI, CV] Dibuja el marco, fondo blanco, símbolo centrado y etiquetas */
     private void refresh()
     {
         if (!visible) {
@@ -285,7 +285,7 @@ public class Wheel
         Canvas.getCanvas().drawText(symbolLabel, detail, xPosition - 4, yPosition + 80);
     }
 
-    /** [W -> CI, CV] Retira las figuras y los dos textos de esta rueda. */
+    /** [W -> CI, CV] Retira las figuras y los dos textos de esta rueda */
     private void hideDrawing()
     {
         symbolCircle.makeInvisible();

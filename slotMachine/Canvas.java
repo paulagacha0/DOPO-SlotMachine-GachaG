@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.*;
 /**
  * [CV] Administra la ventana compartida y el orden de las figuras,contiene las clases
- * auxiliares CanvasPane y ShapeDescription.
  */
 public class Canvas{
     /**
@@ -17,7 +16,6 @@ public class Canvas{
      */
     public static Canvas getCanvas(){
         if(canvasSingleton == null) {
-			canvasSingleton = new Canvas("Slot Machine", 950, 630,
                                          Color.white);
         }
         canvasSingleton.setVisible(true);
@@ -137,7 +135,6 @@ public class Canvas{
         graphic.setColor(original);
     }
     /**
-     * [CV] Panel interno que hereda de JPanel.
      */
     private class CanvasPane extends JPanel{
         /**

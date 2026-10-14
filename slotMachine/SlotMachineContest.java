@@ -70,7 +70,7 @@ public class SlotMachineContest
         if (distinctCount == 1) {
             return;
         }
-        // [SC -> SM] Con todos distintos, elgiro deja exactamente un color ausente
+        // [SC -> SM] Con todos distintos, el giro deja exactamente un color ausente
         move(1, 1);
         if (distinctCount == 1) {
             return;
@@ -109,7 +109,7 @@ public class SlotMachineContest
                 return;
             }
             if (distinctCount <= previousCount) {
-                // [SC] despuesd n-1 pasos uno más devuelve la rueda a su posición inicial
+                // [SC] después de n-1 pasos, uno más devuelve la rueda a su posición inicial
                 move(wheel, 1);
                 if (distinctCount == 1) {
                     return;

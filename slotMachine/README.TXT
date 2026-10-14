@@ -1,21 +1,42 @@
-SlotMachine — Paula Gacha y Diego Mojica
+SLOT MACHINE — CICLO 4 — PAULA GACHA
 
-Abra package.bluej con BlueJ y compile. Hay trece clases principales y cinco
-clases de prueba JUnit 4, con 61 casos. Ejecute Test All en cada una.
+Trabajo actual individual. Se conserva la historia del proyecto previo.
+Base: https://github.com/paulagacha0/DOPO-SlotMachine-GachaG
+Commit de partida: 01eb9cacbfe60aa635cd058e64298dce250b5abb
 
-SlotMachine() crea una máquina manual vacía. SlotMachine(n) crea n ruedas y
-n símbolos con asignación aleatoria; admite 3 a 50 y empieza invisible.
-SlotMachineContest.solve(n) devuelve todos los giros; simulate(n) los muestra
-sobre una nueva máquina. Para la sustentación empiece con n=4.
+PARA EMPEZAR
+1. Abra slotMachine/package.bluej con BlueJ y pulse Compilar.
+2. Ejecute Test All en cada una de las siete clases JUnit.
+3. Para la demostración manual cree new SlotMachine(), sin parámetros.
+4. Siga PRUEBAS_ACEPTACION_C4.md: tiene dos recorridos completos.
 
-La documentación completa está en ../docs/ciclo3. El código está en inglés y
-los comentarios de estudio en español con etiquetas de clase y conexiones.
+NOVEDADES
+Ruedas: normal, lefty, rebel y reverse (tipo adicional propuesto).
+Símbolos: normal, ephemeral y shy.
+Las ruedas nuevas empiezan vacías. Los tipos tienen etiquetas visuales.
+Los métodos anteriores y el solucionador del concurso se conservan.
 
-Origen del material gráfico
-Proyecto shapes, de Michael Kölling y David J. Barnes.
-Material del libro Objects First with Java - A Practical Introduction using
-BlueJ. David J. Barnes y Michael Kölling. Pearson Education, 2002, capítulo 1.
+DOCUMENTOS DE APOYO
+GUIA_CICLO4.md: requisitos, clases, etiquetas, lógica y preguntas.
+PRUEBAS_ACEPTACION_C4.md: entradas y resultados esperados en BlueJ.
+COMO_SUBIR_A_GIT.md: pasos para copiar la carpeta y subir los cambios.
+Los archivos .md son documentos de texto; GitHub los muestra con formato.
 
-El material original ilustra clases, objetos, atributos, métodos, parámetros,
-tipos y varias instancias de una misma clase. Se reutilizan y amplían las
-figuras y el lienzo; la lógica de SlotMachine y del concurso está separada.
+VERIFICACIÓN
+21 archivos Java: 14 clases del programa y 7 de pruebas.
+71 casos aprobados con Java 17 y JUnit 4.13.2.
+El dibujo se comprobó en memoria con una adaptación temporal del lienzo,
+que NO forma parte de esta carpeta. Falta realizar los recorridos manuales
+en su instalación de BlueJ para verificar allí la ventana.
+
+ALCANCE
+Esta carpeta contiene BlueJ y sus pruebas. Astah y la retrospectiva final
+quedan para la siguiente revisión. SlotMachineCC4Test contiene dos casos
+preparados para compartir; falta realizar ese intercambio con el grupo.
+La entrega final también exige estos productos y el TXT para Moodle.
+
+CRÉDITOS
+Ampliación del ciclo 4: Paula Gacha.
+Se conserva el historial del trabajo previo del repositorio.
+Las figuras proceden de shapes, de Michael Kölling y David J. Barnes,
+material de Objects First with Java — A Practical Introduction using BlueJ.

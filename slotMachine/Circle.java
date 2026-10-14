@@ -2,7 +2,7 @@ import java.awt.*;
 import java.awt.geom.*;
 /**
  * [CI] Representa un círculo gráfico con posición, diámetro, color y visibilidad, Wheel utiliza
- * dos instancias de esta clase
+ * tres instancias de esta clase
  */
 public class Circle{
     /**
@@ -160,6 +160,13 @@ public class Circle{
      */
     public void changeColor(String newColor){
         color = newColor;
+        draw();
+    }
+    /** [CI] Ubica el círculo usando coordenadas absolutas */
+    public void moveTo(int x, int y){
+        erase();
+        xPosition = x;
+        yPosition = y;
         draw();
     }
 }

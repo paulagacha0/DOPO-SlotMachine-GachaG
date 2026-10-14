@@ -8,3 +8,4 @@ Proyecto desarrollado por Paula Gacha y Diego Mojica, materia: Desarrollo Orient
 - `docs/ciclo1_corregido/`: Ciclo 1 completo junto con su retrospectiva 
 - `docs/ciclo2/`: Ciclo dos completo con sus test y retrospectiva
 - `docs/ciclo3/`: Ciclo dos completo con sus test y retrospectiva
+- `docs/ciclo4/`: Ciclo dos completo con sus test y retrospectiva

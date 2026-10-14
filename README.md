@@ -1,6 +1,6 @@
 # Slot Machine - DOPO 2026-2
 
-Proyecto desarrollado por Paula Gacha y Diego Mojica, materia: Desarrollo Orientado por Objetos.
+Proyecto desarrollado por Paula Gacha, materia: Desarrollo Orientado por Objetos.
 
 ## Estructura del repositorio
 
